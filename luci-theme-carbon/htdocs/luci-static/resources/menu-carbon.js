@@ -26,6 +26,26 @@ const callAssoc = rpc.declare({ object: 'iwinfo', method: 'assoclist', params: [
 const callUciGet = rpc.declare({ object: 'uci', method: 'get', params: [ 'config', 'section' ], expect: { values: {} } });
 const callUciSet = rpc.declare({ object: 'uci', method: 'set', params: [ 'config', 'section', 'values' ] });
 const callUciCommit = rpc.declare({ object: 'uci', method: 'commit', params: [ 'config' ] });
+const callSetDashboard = rpc.declare({
+	object: 'luci.carbon_update', method: 'set_dashboard',
+	params: [ 'action', 'hero', 'sections', 'monitor', 'tiles', 'details' ],
+	expect: { '': {} }, raise: true
+});
+const callSetSimpleMenu = rpc.declare({
+	object: 'luci.carbon_update', method: 'set_simple_menu',
+	params: [ 'action', 'common', 'system' ],
+	expect: { '': {} }, raise: true
+});
+
+const mapRpcError = (err) => {
+	const msg = String(err && (err.message || err.code || err) || '');
+	if (/denied|forbidden|403|-32002|ubus code 6/i.test(msg)) {
+		const denied = new Error('denied');
+		denied.code = 'denied';
+		throw denied;
+	}
+	throw err;
+};
 
 /*
  * Interface language: lists the installed LuCI catalogues (luci.languages)
@@ -146,22 +166,44 @@ const provider = {
  * Sessions from before an upgrade may only be allowed to read zone 0.
  * rpcd (since 2026-07) re-checks the ACL against the symlink target, so the
  * ACL lists both the /sys/class/… links and their /sys/devices/… targets.
+ * Deduplicate thermal→hwmon virtual bridges, trailing "-thermal" variants,
+ * firmware drivers (scpi_sensors / scmi_sensors) that also register a CPU/SoC
+ * thermal zone, and x86_pkg_temp when coretemp is available.
  */
 let sensors = null;
-const listNames = (dir, pattern) => L.resolveDefault(fs.list(dir), []).then((entries) =>
-	(entries || []).map((e) => e.name).filter((n) => pattern.test(n)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+const listEntries = (dir, pattern) => L.resolveDefault(fs.list(dir), []).then((entries) =>
+	(entries || []).filter((e) => e && pattern.test(e.name)).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })));
+const listNames = (dir, pattern) => listEntries(dir, pattern).then((entries) => entries.map((e) => e.name));
 const readName = (path, fallback) => L.resolveDefault(fs.read(path), '').then((v) => String(v || '').trim() || fallback);
+const sensorKey = (name) => {
+	const raw = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+	return raw.replace(/thermal$/, '') || raw;
+};
+const isThermalBridge = (target) => /(?:^|\/)virtual\/thermal(?:\/|$)/.test(String(target || ''));
+const isCpuThermalZone = (name) => /^(cpu|soc|aml|cluster|big|little|core|pkg|sys|die|tsens|thermalzone)/.test(sensorKey(name));
+const isFirmwareSensor = (name) => /^sc[pm]isensors$/.test(sensorKey(name));
 function findSensors() {
 	const thermal = listNames('/sys/class/thermal', /^thermal_zone\d+$/).then((zones) => Promise.all(zones.slice(0, 8).map((z) =>
 		readName('/sys/class/thermal/' + z + '/type', z).then((name) => ({ name: name, path: '/sys/class/thermal/' + z + '/temp' })))));
-	const hwmon = listNames('/sys/class/hwmon', /^hwmon\d+$/).then((devs) => Promise.all(devs.slice(0, 8).map((d) =>
-		listNames('/sys/class/hwmon/' + d, /^temp\d+_input$/).then((inputs) => inputs.length ? readName('/sys/class/hwmon/' + d + '/name', d)
-			.then((name) => ({ name: name, path: '/sys/class/hwmon/' + d + '/' + inputs[0] })) : null))));
+	const hwmon = listEntries('/sys/class/hwmon', /^hwmon\d+$/).then((devs) => Promise.all(devs.slice(0, 8).map((d) =>
+		listNames('/sys/class/hwmon/' + d.name, /^temp\d+_input$/).then((inputs) => inputs.length ? readName('/sys/class/hwmon/' + d.name + '/name', d.name)
+			.then((name) => ({ name: name, path: '/sys/class/hwmon/' + d.name + '/' + inputs[0], target: d.target || '' })) : null))));
 	return Promise.all([thermal, hwmon]).then((r) => {
+		const zones = r[0].filter(Boolean);
+		const mons = r[1].filter(Boolean);
+		const hasCoretemp = mons.some((s) => sensorKey(s.name) === 'coretemp');
+		const keptZones = hasCoretemp ? zones.filter((s) => sensorKey(s.name) !== 'x86pkgtemp') : zones;
+		const hasCpuZone = keptZones.some((s) => isCpuThermalZone(s.name));
+		const keptMons = mons.filter((s) => {
+			if (zones.length && isThermalBridge(s.target)) return false;
+			if (hasCoretemp && sensorKey(s.name) === 'x86pkgtemp') return false;
+			if (hasCpuZone && isFirmwareSensor(s.name)) return false;
+			return true;
+		});
 		const seen = {}, list = [];
-		r[0].concat(r[1]).forEach((s) => {
-			const key = s && s.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-			if (s && !seen[key]) { seen[key] = true; list.push(s); }
+		keptZones.concat(keptMons).forEach((s) => {
+			const key = sensorKey(s.name);
+			if (!seen[key]) { seen[key] = true; list.push({ name: s.name, path: s.path }); }
 		});
 		return list.length ? list : [{ name: '', path: '/sys/class/thermal/thermal_zone0/temp' }];
 	});
@@ -212,6 +254,8 @@ return baseclass.extend({
 			c.children.forEach((ch) => { known[ch.path] = ch; });
 		});
 
+		const app = document.querySelector('.cb-app');
+
 		C.initShell({
 			logoutUrl: known[root.name + '/logout'] ? L.url(root.name, 'logout') : null,
 			language: this.language
@@ -221,7 +265,31 @@ return baseclass.extend({
 			root: root.name,
 			categories: categories,
 			activePath: L.env.dispatchpath,
-			url: (p) => L.url(p)
+			url: (p) => L.url(p),
+			simpleMenuAttr: (app && app.dataset && app.dataset.simpleMenu) || '',
+			saveSimpleMenu: (cfg) => {
+				const s = C.simpleMenu.serialize(cfg);
+				return callSetSimpleMenu('set', s.common, s.system).then((res) => {
+					if (res && res.error) {
+						const err = new Error(res.error);
+						err.code = res.error;
+						throw err;
+					}
+					if (app && app.dataset)
+						app.dataset.simpleMenu = C.simpleMenu.encodeAttr(cfg);
+					return res;
+				}, mapRpcError);
+			},
+			resetSimpleMenu: () => callSetSimpleMenu('reset', '', '').then((res) => {
+				if (res && res.error) {
+					const err = new Error(res.error);
+					err.code = res.error;
+					throw err;
+				}
+				if (app && app.dataset)
+					delete app.dataset.simpleMenu;
+				return res;
+			}, mapRpcError)
 		});
 
 		/* toolbar title: Category › Page */
@@ -284,6 +352,7 @@ return baseclass.extend({
 			return;
 
 		const link = (p) => known[rootName + '/' + p] ? L.url(rootName, p) : null;
+		const app = document.querySelector('.cb-app');
 		const host = E('div', { 'id': 'cb-dashboard' });
 
 		main.insertBefore(host, (view && view.parentNode === main) ? view : null);
@@ -293,7 +362,31 @@ return baseclass.extend({
 				network: link('network/network'),
 				wireless: link('network/wireless'),
 				devices: link('network/dhcp')
-			}
+			},
+			dashboardAttr: (app && app.dataset && app.dataset.dashboard) || '',
+			saveLayout: (layout) => {
+				const s = C.dashboardLayout.serialize(layout);
+				return callSetDashboard('set', s.hero, s.sections, s.monitor, s.tiles, s.details).then((res) => {
+					if (res && res.error) {
+						const err = new Error(res.error);
+						err.code = res.error;
+						throw err;
+					}
+					if (app && app.dataset)
+						app.dataset.dashboard = C.dashboardLayout.encodeAttr(layout);
+					return res;
+				}, mapRpcError);
+			},
+			resetLayout: () => callSetDashboard('reset', '', '', '', '', '').then((res) => {
+				if (res && res.error) {
+					const err = new Error(res.error);
+					err.code = res.error;
+					throw err;
+				}
+				if (app && app.dataset)
+					delete app.dataset.dashboard;
+				return res;
+			}, mapRpcError)
 		});
 
 		/* LuCI's own status widgets stay below the dashboard. While they are

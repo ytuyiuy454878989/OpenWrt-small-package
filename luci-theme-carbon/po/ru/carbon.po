@@ -8,6 +8,14 @@ msgid "%d cores"
 msgstr "Ядер: %d"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "%d device"
+msgstr "Устройств: %d"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "%d devices"
+msgstr "Устройств: %d"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "%d min"
 msgstr "%d мин"
 
@@ -40,6 +48,18 @@ msgid "%s left"
 msgstr "осталось %s"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "+%d more"
+msgstr "Ещё %d"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "1 / 5 / 15 min load: %s · %s · %s"
+msgstr "Нагрузка 1 / 5 / 15 мин: %s · %s · %s"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "1 / 5 / 15 min load: %s · %s · %s (%d cores)"
+msgstr "Нагрузка 1 / 5 / 15 мин: %s · %s · %s (ядер: %d)"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "1 min average"
 msgstr "Среднее за 1 мин"
 
@@ -58,6 +78,26 @@ msgstr "Доступна новая версия."
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "About this setting"
 msgstr "Об этой настройке"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add live traffic"
+msgstr "Добавить график трафика"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add page"
+msgstr "Добавить страницу"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add to Common"
+msgstr "Добавить в «Основное»"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add to System"
+msgstr "Добавить в «Система»"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Added"
+msgstr "Добавлено"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "All settings"
@@ -88,8 +128,16 @@ msgid "Auto"
 msgstr "Авто"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Back"
+msgstr "Назад"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Backup & Upgrade"
 msgstr "Резервная копия и прошивка"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Busy"
+msgstr "Повышена"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Cache"
@@ -99,6 +147,7 @@ msgstr "Кэш"
 msgid "Camera"
 msgstr "Камера"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Cancel"
 msgstr "Отмена"
@@ -125,9 +174,29 @@ msgstr "Проверка обновлений…"
 msgid "Choose a valid traffic source."
 msgstr "Выберите допустимый источник данных о трафике."
 
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Choose which pages appear in the Simple sidebar and arrange their order. Saved on this router across devices and firmware upgrades."
+msgstr "Выберите страницы для простого меню в боковой панели и настройте их порядок. Настройки сохраняются на роутере между устройствами и после обновления прошивки."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Choose which panels appear on Overview and arrange them in sections. Saved on this router across devices and firmware upgrades."
+msgstr "Выберите панели для страницы «Обзор» и настройте порядок разделов. Настройки сохраняются на роутере между устройствами и после обновления прошивки."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Clear"
+msgstr "Очистить"
+
 #: htdocs/luci-static/carbon/carbon.js
 msgid "click to switch"
 msgstr "нажмите, чтобы переключить"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Close"
+msgstr "Закрыть"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Collapse panel to preview"
+msgstr "Свернуть панель для просмотра"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Collapse sidebar"
@@ -162,6 +231,10 @@ msgid "Connections"
 msgstr "Соединения"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Core monitoring"
+msgstr "Основной мониторинг"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "CPU"
 msgstr "ЦП"
 
@@ -170,8 +243,49 @@ msgid "Current logo"
 msgstr "Текущий логотип"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Customize"
+msgstr "Настроить"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Customize dashboard"
+msgstr "Настройка панели"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Customize menu"
+msgstr "Настроить меню"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Customize on Overview"
+msgstr "Настроить на странице «Обзор»"
+
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Customize simple menu"
+msgstr "Настройка простого меню"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Dark"
 msgstr "Тёмная"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Dashboard layout"
+msgstr "Макет панели"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Default"
+msgstr "По умолчанию"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Default dashboard layout restored."
+msgstr "Макет панели по умолчанию восстановлен."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Default simple menu restored."
+msgstr "Простое меню по умолчанию восстановлено."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Details"
+msgstr "Подробности"
 
 #: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
@@ -215,8 +329,20 @@ msgid "Enter an HTTPS mirror prefix such as https://mirror.example.com/ (letters
 msgstr "Введите префикс HTTPS-зеркала, например https://mirror.example.com/ (только буквы, цифры и . _ ~ % + -)."
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Expand"
+msgstr "Развернуть"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Expand sidebar"
 msgstr "Развернуть боковую панель"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Failed to save layout."
+msgstr "Не удалось сохранить макет."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Failed to save menu."
+msgstr "Не удалось сохранить меню."
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Free"
@@ -241,6 +367,22 @@ msgstr "Скрытая сеть"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Hide detailed status"
 msgstr "Скрыть подробное состояние"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "High"
+msgstr "Высокая"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Home Wi-Fi"
+msgstr "Домашний Wi-Fi"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "In Common"
+msgstr "В «Основное»"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "In System"
+msgstr "В «Система»"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Install curl, ca-bundle and flock, and restore the Carbon public key if missing."
@@ -274,6 +416,16 @@ msgstr "Интерфейсы"
 msgid "Internet & Network"
 msgstr "Интернет и сеть"
 
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Invalid dashboard layout."
+msgstr "Недопустимый макет панели."
+
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Invalid simple menu configuration."
+msgstr "Недопустимая конфигурация простого меню."
+
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Invalid update request."
 msgstr "Неверный запрос на обновление."
@@ -281,6 +433,14 @@ msgstr "Неверный запрос на обновление."
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "IPK updates are downloaded over HTTPS and checked against the release SHA-256 and file size."
 msgstr "IPK-обновления скачиваются по HTTPS и сверяются с SHA-256 и размером, опубликованными для выпуска."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Keep at least one menu item."
+msgstr "Оставьте хотя бы один пункт меню."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Keep at least one panel visible."
+msgstr "Оставьте видимой хотя бы одну панель."
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Known to this router"
@@ -331,6 +491,10 @@ msgid "Manage"
 msgstr "Управление"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Maximum %d menu items."
+msgstr "Не более %d пунктов меню."
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "May include offline devices."
 msgstr "Может включать устройства не в сети."
 
@@ -345,6 +509,18 @@ msgstr "Меню"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Mirror prefix"
 msgstr "Префикс зеркала"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Move down"
+msgstr "Вниз"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Move up"
+msgstr "Вверх"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Multi-WAN"
+msgstr "Мульти-WAN"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Need more settings? Switch to"
@@ -367,6 +543,10 @@ msgid "nlbwmon (default)"
 msgstr "nlbwmon (по умолчанию)"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "No configured pages are currently installed."
+msgstr "Ни одна из настроенных страниц сейчас не установлена."
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "No devices yet"
 msgstr "Устройств пока нет"
 
@@ -375,8 +555,20 @@ msgid "No installation log yet."
 msgstr "Журнала установки пока нет."
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "No items in this group."
+msgstr "В этой группе нет пунктов."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "No matching pages."
+msgstr "Подходящих страниц не найдено."
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "No wireless"
 msgstr "Нет Wi-Fi"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Normal"
+msgstr "Норма"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Not checked"
@@ -389,6 +581,10 @@ msgstr "Не подключено"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Not enough temporary storage or unable to create update files."
 msgstr "Недостаточно временного места или не удалось создать файлы обновления."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Not installed"
+msgstr "Не установлено"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Now"
@@ -426,6 +622,7 @@ msgstr "Обзор"
 msgid "Password"
 msgstr "Пароль"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Permission denied. Log out and log in again once after updating Carbon, then retry."
 msgstr "Доступ запрещён. После обновления Carbon один раз выйдите и войдите снова, затем повторите."
@@ -441,6 +638,10 @@ msgstr "Телефон"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "PPPoE"
 msgstr "PPPoE"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Preset"
+msgstr "Пресет"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Printer"
@@ -483,13 +684,23 @@ msgid "Reload page"
 msgstr "Перезагрузить страницу"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Remove"
+msgstr "Удалить"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Resources"
 msgstr "Ресурсы"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Restore default"
 msgstr "Вернуть по умолчанию"
 
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Router overview"
+msgstr "Сводка роутера"
+
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Save"
 msgstr "Сохранить"
@@ -502,9 +713,14 @@ msgstr "Сохранено. Загрузка сначала идёт через 
 msgid "Saved. Downloads use GitHub directly."
 msgstr "Сохранено. Загрузка идёт напрямую с GitHub."
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Saving…"
 msgstr "Сохранение…"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Search pages or plugins…"
+msgstr "Поиск страниц и плагинов…"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Show all %d devices"
@@ -525,6 +741,10 @@ msgstr "Отображается в боковой панели, на стран
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Simple"
 msgstr "Простой"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Simple menu"
+msgstr "Простое меню"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Since %s"
@@ -547,12 +767,20 @@ msgid "Speaker"
 msgstr "Колонка"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Stat tiles"
+msgstr "Плитки показателей"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Static address"
 msgstr "Статический адрес"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Storage"
 msgstr "Хранилище"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Switch to Carbon theme to customize the simple menu."
+msgstr "Переключитесь на тему Carbon, чтобы настроить простое меню."
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "System"
@@ -677,6 +905,22 @@ msgstr "Время работы"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Used"
 msgstr "Занято"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using a custom dashboard layout."
+msgstr "Используется пользовательский макет панели."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using a custom simple menu."
+msgstr "Используется пользовательское простое меню."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using the default dashboard layout."
+msgstr "Используется макет панели по умолчанию."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using the default simple menu."
+msgstr "Используется простое меню по умолчанию."
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Verifying update…"

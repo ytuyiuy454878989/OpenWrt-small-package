@@ -373,6 +373,7 @@ function tokenMessage(token) {
 		upload_target_unavailable: _('The temporary configuration upload is unavailable. Try again.'),
 		config_too_large: _('The configuration file exceeds the 2 MiB limit.'),
 		config_applied: _('Configuration applied and Honk is running.'),
+		config_applied_secrets_moved: _('Configuration applied and Honk is running. The listener secret moved to secrets.dae.'),
 		config_apply_failed_rolled_back: _('Honk could not start with this configuration. The previous file was restored.'),
 		config_apply_rollback_failed: _('Startup failed and the automatic rollback did not finish. The snapshot was kept; run system recovery.'),
 		config_changed_concurrently: _('The configuration changed during the operation. Nothing was applied.'),
@@ -504,6 +505,12 @@ function tokenMessage(token) {
 
 function statusIssue(token) {
 	/* 内核模块检查会带上具体模块名，按前缀拆开再填进文案 */
+	if (typeof token === 'string' && token.indexOf('geo_asset_') === 0) {
+		const parts = token.split(':'), name = parts[1] || 'geo';
+		return parts[0] === 'geo_asset_truncated'
+			? _('The %s data file is incomplete (under 4 MiB). Download it again from Maintenance → Geo data.').format(name)
+			: _('The %s data file is missing. Download it from Maintenance → Geo data.').format(name);
+	}
 	if (typeof token === 'string' && token.indexOf('kernel_module_missing:') === 0)
 		return _('缺少内核模块 %s，请确认 kmod-sched-core / kmod-sched-bpf / kmod-veth / kmod-nft-queue 已安装。').format(token.slice('kernel_module_missing:'.length));
 

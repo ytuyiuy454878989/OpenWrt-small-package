@@ -71,6 +71,7 @@ func parseShadowsocks(raw, sourceID string) *model.ProxyNode {
 	var pluginTLS bool
 	var pluginMux *bool
 	var udpRelayEnabled *bool
+	var shadowTLS *model.ShadowTLSOptions
 
 	if qi := strings.IndexByte(payload, '?'); qi >= 0 {
 		query := payload[qi+1:]
@@ -99,6 +100,9 @@ func parseShadowsocks(raw, sourceID string) *model.ProxyNode {
 				pluginPath = opts.path
 				pluginTLS = opts.tls
 				pluginMux = opts.mux
+			} else if opts := shadowTLSPluginOptions(plugin); opts != nil {
+				sip003Plugin = "shadow-tls"
+				shadowTLS = opts
 			} else {
 				return nil
 			}
@@ -151,6 +155,7 @@ func parseShadowsocks(raw, sourceID string) *model.ProxyNode {
 		Transport:       pluginTransport,
 		Plugin:          sip003Plugin,
 		PluginMux:       pluginMux,
+		ShadowTLS:       shadowTLS,
 		TLS:             pluginTLS,
 		HostHeader:      obfsHost,
 		Path:            pluginPath,
@@ -161,8 +166,36 @@ func parseShadowsocks(raw, sourceID string) *model.ProxyNode {
 	}
 }
 
+// sip003Fields splits a SIP003 plugin option string on unescaped `;`. A
+// backslash escapes the next character, so `path=/foo\;bar` is one field,
+// not two. It returns nil when the string ends on a dangling backslash.
+func sip003Fields(plugin string) []string {
+	var parts []string
+	var part strings.Builder
+	escaped := false
+	for _, r := range plugin {
+		switch {
+		case escaped:
+			part.WriteRune(r)
+			escaped = false
+		case r == '\\':
+			escaped = true
+		case r == ';':
+			parts = append(parts, part.String())
+			part.Reset()
+		default:
+			part.WriteRune(r)
+		}
+	}
+	if escaped {
+		return nil
+	}
+	parts = append(parts, part.String())
+	return parts
+}
+
 func simpleObfsOptions(plugin string) (mode, host string) {
-	parts := strings.Split(plugin, ";")
+	parts := sip003Fields(plugin)
 	if len(parts) == 0 {
 		return "", ""
 	}
@@ -195,7 +228,7 @@ type v2rayPluginOpts struct {
 }
 
 func v2rayPluginOptions(plugin string) *v2rayPluginOpts {
-	parts := strings.Split(plugin, ";")
+	parts := sip003Fields(plugin)
 	if len(parts) == 0 || strings.ToLower(strings.TrimSpace(parts[0])) != "v2ray-plugin" {
 		return nil
 	}
@@ -919,18 +952,39 @@ func parseSnellLine(raw, sourceID string) *model.ProxyNode {
 	if psk == "" || !snellModeIsDefault(options["mode"]) {
 		return nil
 	}
+	// ShadowTLS rides on the same shadow-tls-* keys as the SS line. An
+	// unknown key or an invalid combination rejects the node instead of
+	// silently importing a plain Snell that can never connect.
+	shadowTLS, ok := surgeShadowTLSOptions(options, percentDecode)
+	if !ok {
+		return nil
+	}
+	// ShadowTLS only wraps TCP: keep udp-relay only when the source line
+	// says so explicitly, and only on a wrapped node.
+	var udpRelayEnabled *bool
+	plugin := ""
+	if shadowTLS != nil {
+		plugin = "shadow-tls"
+		if value, present := options["udp-relay"]; present {
+			b := boolString(value)
+			udpRelayEnabled = &b
+		}
+	}
 	return &model.ProxyNode{
-		SourceID:   sourceID,
-		Kind:       model.KindSnell,
-		Name:       name,
-		Server:     server,
-		Port:       port,
-		Password:   psk,
-		HostHeader: options["obfs-host"],
-		Obfs:       options["obfs"],
-		ObfsParam:  options["obfs-host"],
-		Version:    intPtr(options["version"]),
-		RawURI:     raw,
+		SourceID:        sourceID,
+		Kind:            model.KindSnell,
+		Name:            name,
+		Server:          server,
+		Port:            port,
+		Password:        psk,
+		HostHeader:      options["obfs-host"],
+		Obfs:            options["obfs"],
+		ObfsParam:       options["obfs-host"],
+		Version:         intPtr(options["version"]),
+		Plugin:          plugin,
+		ShadowTLS:       shadowTLS,
+		UDPRelayEnabled: udpRelayEnabled,
+		RawURI:          raw,
 	}
 }
 
@@ -939,7 +993,7 @@ func parseSnellLine(raw, sourceID string) *model.ProxyNode {
 type trojanWS struct{ transport, host, path string }
 
 func shadowrocketTrojanWebSocketOptions(plugin string) *trojanWS {
-	parts := strings.Split(plugin, ";")
+	parts := sip003Fields(plugin)
 	if len(parts) == 0 {
 		return nil
 	}

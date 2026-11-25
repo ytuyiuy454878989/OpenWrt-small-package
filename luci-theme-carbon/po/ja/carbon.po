@@ -8,6 +8,14 @@ msgid "%d cores"
 msgstr "%d コア"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "%d device"
+msgstr "%d 台"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "%d devices"
+msgstr "%d 台"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "%d min"
 msgstr "%d 分"
 
@@ -40,6 +48,18 @@ msgid "%s left"
 msgstr "残り %s"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "+%d more"
+msgstr "他 %d 件"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "1 / 5 / 15 min load: %s · %s · %s"
+msgstr "1 / 5 / 15 分平均負荷: %s · %s · %s"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "1 / 5 / 15 min load: %s · %s · %s (%d cores)"
+msgstr "1 / 5 / 15 分平均負荷: %s · %s · %s（%d コア）"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "1 min average"
 msgstr "1 分平均"
 
@@ -58,6 +78,26 @@ msgstr "新しいバージョンがあります。"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "About this setting"
 msgstr "この設定について"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add live traffic"
+msgstr "リアルタイム通信量を追加"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add page"
+msgstr "ページを追加"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add to Common"
+msgstr "よく使う項目に追加"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add to System"
+msgstr "システムに追加"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Added"
+msgstr "追加済み"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "All settings"
@@ -88,8 +128,16 @@ msgid "Auto"
 msgstr "自動"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Back"
+msgstr "戻る"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Backup & Upgrade"
 msgstr "バックアップと更新"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Busy"
+msgstr "やや高い"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Cache"
@@ -99,6 +147,7 @@ msgstr "キャッシュ"
 msgid "Camera"
 msgstr "カメラ"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Cancel"
 msgstr "キャンセル"
@@ -125,9 +174,29 @@ msgstr "更新を確認しています…"
 msgid "Choose a valid traffic source."
 msgstr "有効なトラフィックデータの取得元を選択してください。"
 
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Choose which pages appear in the Simple sidebar and arrange their order. Saved on this router across devices and firmware upgrades."
+msgstr "シンプルモードのサイドバーに表示するページと並び順を設定します。設定はルーターに保存され、デバイス間およびファームウェア更新後も維持されます。"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Choose which panels appear on Overview and arrange them in sections. Saved on this router across devices and firmware upgrades."
+msgstr "概要ページに表示するパネルとセクション構成を選択します。設定はルーターに保存され、デバイス間およびファームウェア更新後も維持されます。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Clear"
+msgstr "クリア"
+
 #: htdocs/luci-static/carbon/carbon.js
 msgid "click to switch"
 msgstr "クリックで切り替え"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Close"
+msgstr "閉じる"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Collapse panel to preview"
+msgstr "パネルを折りたたんでプレビュー"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Collapse sidebar"
@@ -162,6 +231,10 @@ msgid "Connections"
 msgstr "接続数"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Core monitoring"
+msgstr "メインモニター"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "CPU"
 msgstr "CPU"
 
@@ -170,8 +243,49 @@ msgid "Current logo"
 msgstr "現在のロゴ"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Customize"
+msgstr "カスタマイズ"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Customize dashboard"
+msgstr "ダッシュボードをカスタマイズ"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Customize menu"
+msgstr "メニューをカスタマイズ"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Customize on Overview"
+msgstr "概要でカスタマイズ"
+
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Customize simple menu"
+msgstr "シンプルメニューをカスタマイズ"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Dark"
 msgstr "ダーク"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Dashboard layout"
+msgstr "ダッシュボードのレイアウト"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Default"
+msgstr "デフォルト"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Default dashboard layout restored."
+msgstr "デフォルトのダッシュボードレイアウトに戻しました。"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Default simple menu restored."
+msgstr "デフォルトのシンプルメニューに戻しました。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Details"
+msgstr "詳細リスト"
 
 #: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
@@ -215,8 +329,20 @@ msgid "Enter an HTTPS mirror prefix such as https://mirror.example.com/ (letters
 msgstr "https://mirror.example.com/ のような HTTPS ミラーのプレフィックスを入力してください（英数字と . _ ~ % + - のみ）。"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Expand"
+msgstr "展開"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Expand sidebar"
 msgstr "サイドバーを展開"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Failed to save layout."
+msgstr "レイアウトの保存に失敗しました。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Failed to save menu."
+msgstr "メニューの保存に失敗しました。"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Free"
@@ -241,6 +367,22 @@ msgstr "非公開ネットワーク"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Hide detailed status"
 msgstr "詳細なステータスを隠す"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "High"
+msgstr "高負荷"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Home Wi-Fi"
+msgstr "ホーム Wi-Fi"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "In Common"
+msgstr "よく使う項目に登録済み"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "In System"
+msgstr "システムに登録済み"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Install curl, ca-bundle and flock, and restore the Carbon public key if missing."
@@ -274,6 +416,16 @@ msgstr "インターフェイス"
 msgid "Internet & Network"
 msgstr "インターネットとネットワーク"
 
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Invalid dashboard layout."
+msgstr "無効なダッシュボードレイアウトです。"
+
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Invalid simple menu configuration."
+msgstr "無効なシンプルメニュー設定です。"
+
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Invalid update request."
 msgstr "無効な更新リクエストです。"
@@ -281,6 +433,14 @@ msgstr "無効な更新リクエストです。"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "IPK updates are downloaded over HTTPS and checked against the release SHA-256 and file size."
 msgstr "IPK の更新は HTTPS でダウンロードし、リリースの SHA-256 とファイルサイズで確認します。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Keep at least one menu item."
+msgstr "少なくとも 1 つのメニュー項目を残してください。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Keep at least one panel visible."
+msgstr "少なくとも 1 つのパネルを表示してください。"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Known to this router"
@@ -331,6 +491,10 @@ msgid "Manage"
 msgstr "管理"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Maximum %d menu items."
+msgstr "メニュー項目は最大 %d 件です。"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "May include offline devices."
 msgstr "オフラインのデバイスが含まれる場合があります。"
 
@@ -345,6 +509,18 @@ msgstr "メニュー"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Mirror prefix"
 msgstr "ミラーのプレフィックス"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Move down"
+msgstr "下へ移動"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Move up"
+msgstr "上へ移動"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Multi-WAN"
+msgstr "マルチ WAN"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Need more settings? Switch to"
@@ -367,6 +543,10 @@ msgid "nlbwmon (default)"
 msgstr "nlbwmon（既定）"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "No configured pages are currently installed."
+msgstr "設定されたページは現在インストールされていません。"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "No devices yet"
 msgstr "デバイスはまだありません"
 
@@ -375,8 +555,20 @@ msgid "No installation log yet."
 msgstr "インストールログはまだありません。"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "No items in this group."
+msgstr "このグループに項目はありません。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "No matching pages."
+msgstr "一致するページがありません。"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "No wireless"
 msgstr "無線なし"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Normal"
+msgstr "正常"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Not checked"
@@ -389,6 +581,10 @@ msgstr "未接続"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Not enough temporary storage or unable to create update files."
 msgstr "一時領域が不足しているか、更新ファイルを作成できません。"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Not installed"
+msgstr "未インストール"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Now"
@@ -426,6 +622,7 @@ msgstr "概要"
 msgid "Password"
 msgstr "パスワード"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Permission denied. Log out and log in again once after updating Carbon, then retry."
 msgstr "権限がありません。Carbon を更新した後、一度ログアウトして再ログインしてから、もう一度お試しください。"
@@ -441,6 +638,10 @@ msgstr "スマートフォン"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "PPPoE"
 msgstr "PPPoE"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Preset"
+msgstr "プリセット"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Printer"
@@ -483,13 +684,23 @@ msgid "Reload page"
 msgstr "ページを再読み込み"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Remove"
+msgstr "削除"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Resources"
 msgstr "リソース"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Restore default"
 msgstr "デフォルトに戻す"
 
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Router overview"
+msgstr "ルーター概要"
+
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Save"
 msgstr "保存"
@@ -502,9 +713,14 @@ msgstr "保存しました。ダウンロードはミラーを先に試し、次
 msgid "Saved. Downloads use GitHub directly."
 msgstr "保存しました。ダウンロードは GitHub を直接使います。"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Saving…"
 msgstr "保存しています…"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Search pages or plugins…"
+msgstr "ページやプラグインを検索…"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Show all %d devices"
@@ -525,6 +741,10 @@ msgstr "サイドバー、ログインページ、概要ページ、ブラウザ
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Simple"
 msgstr "シンプル"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Simple menu"
+msgstr "シンプルメニュー"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Since %s"
@@ -547,12 +767,20 @@ msgid "Speaker"
 msgstr "スピーカー"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Stat tiles"
+msgstr "ステータスカード"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Static address"
 msgstr "静的アドレス"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Storage"
 msgstr "ストレージ"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Switch to Carbon theme to customize the simple menu."
+msgstr "シンプルメニューをカスタマイズするには Carbon テーマに切り替えてください。"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "System"
@@ -677,6 +905,22 @@ msgstr "稼働時間"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Used"
 msgstr "使用中"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using a custom dashboard layout."
+msgstr "カスタムのダッシュボードレイアウトを使用中です。"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using a custom simple menu."
+msgstr "カスタムのシンプルメニューを使用中です。"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using the default dashboard layout."
+msgstr "デフォルトのダッシュボードレイアウトを使用中です。"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using the default simple menu."
+msgstr "デフォルトのシンプルメニューを使用中です。"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Verifying update…"

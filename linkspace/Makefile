@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 PKG_NAME:=linkspace
-PKG_VERSION:=0.3.2
+PKG_VERSION:=0.3.3
 PKG_RELEASE:=2
 include ./release.mk
 PKG_SOURCE:=linkspace-$(PKG_VERSION)-$(ARCH).tar.gz

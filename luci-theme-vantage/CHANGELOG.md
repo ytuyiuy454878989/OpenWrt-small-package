@@ -1,10 +1,322 @@
 # Changelog
 
 User-visible changes per release, newest first. Dates are the tag dates.
-Each release ships both packages, `luci-theme-vantage` and
-`luci-app-vantage`, at the same version; the packages are listed at
+Each release ships all packages, `luci-theme-vantage`,
+`luci-app-vantage` and the optional add-ons, at the same version; the
+packages are listed at
 <https://github.com/anothaDev/luci-theme-vantage/releases> and in the
 [signed repositories](https://anothadev.github.io/luci-theme-vantage/).
+
+## 1.2.1 - 2026-11-25
+
+- **Dashboard: the uplink's download and upload on a port that also
+  carries the LAN** (#166,
+  [@milindpatel63](https://github.com/milindpatel63)). With the WAN
+  untagged on the device the LAN's VLANs are on (`eth0` beside `eth0.3`:
+  a switch's CPU port, or one port for everything), the uplink showed
+  the same rate in both directions: the kernel counts the VLANs' traffic
+  on that device too, so each direction read download plus upload. The
+  dashboard now takes the rates of those VLANs off the line's own, in
+  the uplink card, the chart and the network path. The counters since
+  boot in the uplink's details are still the device's. With software
+  flow offloading on, the upload is right and the download still
+  includes the upload: the kernel does not count what an offloaded
+  connection brings in on a VLAN's device.
+- **Wi-Fi: clients on a VLAN of their own are listed** (#164,
+  [@milindpatel63](https://github.com/milindpatel63)). Where a network's
+  passwords (or RADIUS) give each client its VLAN, hostapd puts the
+  client on an interface of that VLAN, and neither the dashboard nor
+  LuCI's Wireless page listed it there. The dashboard now asks those
+  interfaces too and shows their clients under the network, with the
+  interface in a client's details, and counts their traffic to the
+  network and its radio. It reads no password for this, as before. A
+  paired access point reports such clients too
+  (`luci-app-vantage-aps`).
+- **Other access points: an access point's own bridges are no wired
+  clients** (#167,
+  [@milindpatel63](https://github.com/milindpatel63)). A paired access
+  point with several networks has a bridge with an address of its own
+  for each, and the router listed each as one more wired device. The
+  access point now reports its own addresses and the router leaves them
+  out; the access point's own row says how many, and its details name
+  them. A router whose VLANs are devices of their own (`eth0.1`,
+  `eth0.3`) also shows an access point's clients on another VLAN than
+  its own as that access point's, where they stayed wired hosts of the
+  router. The first needs 1.2.1 on the access points as well.
+- **Ports tile and LuCI's Port status: no line broken before its last
+  word** (#168, [@VIKINGYFY](https://github.com/VIKINGYFY)). A port's
+  errors and drops broke before the last word in a narrow cell, in
+  Chinese at any width near the smallest: the line now breaks between
+  its label and its counts. In LuCI's Port status a counter stays on
+  one line with its unit.
+
+## 1.2.0 - 2026-11-23
+
+- **Dashboard: a module that cannot load no longer costs LuCI its
+  login** (#134, [@HachiMiku39](https://github.com/HachiMiku39)). The
+  dashboard's rpcd plugin needs two netlink modules of ucode. Where one
+  of them cannot load (taken from another distribution's feed, on vendor
+  firmware), the plugin fails, and on ucode from before late 2024
+  (OpenWrt 23.05 and firmware built on it) that failure could leave
+  LuCI's own rpcd script on freed memory and bring rpcd down, and every
+  login with it. This is read from that ucode's source; I could not
+  reproduce it on a device. The plugin now loads those two modules
+  first, so such a failure costs the dashboard its data and nothing
+  else. OpenWrt 24.10 and 25.12 were not affected. See
+  [Troubleshooting](docs/INSTALL.md#no-login-works-after-installing-the-dashboard).
+- **Other access points: a device wired to one shows its traffic where
+  it has a port to itself there** (#110). The Clients list had "Shared
+  port" and no traffic for every device behind a paired access point,
+  because the router sees only the access point's port. Where the access
+  point has the device alone on one of its own ports, the list and the
+  device's details now show the rate the access point counts there, and
+  say so. Top talkers still ranks none of a paired access point's
+  devices.
+- **Tiles from other packages, experimental** (#129,
+  [@nubbhr](https://github.com/nubbhr)). Another package can put a
+  read-only tile on the dashboard: it answers one ubus call with numbers
+  and short texts, and the dashboard draws them in its own look, with
+  the package's id in a small tag beside the tile's name, so that it
+  cannot pass for one of the dashboard's own tiles. The tile shows only
+  for logins that hold that package's own permission; the dashboard's
+  permissions are unchanged, and without such a package the dashboard
+  makes one call more per page and looks as before. Experimental: what
+  a package sends and how the dashboard shows it may change in any
+  release. For package authors: [Provider tiles](docs/TILES.md).
+- **Traffic per device for devices that share a port** (optional add-on
+  `luci-app-vantage-traffic`, experimental; #110,
+  [@MohdMusab](https://github.com/MohdMusab)). On a router, devices
+  behind a switch, or behind an access point that is not paired, share
+  one port, and the Clients list had no traffic for them. With this
+  add-on on the router, the list and a device's details show the traffic
+  that passes the router for each of them, counted from the router's own
+  connection tracking, and say so: what devices of one network send each
+  other is not in it. It adds no firewall rule and changes no setting.
+  It reads in a process of its own, so LuCI keeps answering meanwhile,
+  whatever the size of the router's connection table; one read serves
+  every open dashboard, and a slow read makes the next wait longer, so
+  it takes about a tenth of one core. A device's own port and a paired
+  access point's count still come first, and Top talkers is unchanged.
+  Seeing it needs a permission of its own, `luci-app-vantage-traffic`.
+  Install it on the router: `apk add luci-app-vantage-traffic` (24.10:
+  `opkg install luci-app-vantage-traffic`). See
+  [Per-device traffic](docs/INSTALL.md#per-device-traffic-optional-experimental).
+- **Dashboard: a compact network path** (in answer to #157,
+  [@Vikk20](https://github.com/Vikk20)). With several access points and
+  many ports, the network path runs several screens long. Under
+  Customize, beside the throughput chart's style, **Network path** now
+  offers **Compact, one line each**: every Wi-Fi network, every
+  Ethernet port and every access point becomes one line with its name,
+  how many clients or devices it has and its live rate, and the client
+  rows go. A red dot before the count still marks a client with a weak
+  signal, and a click on a line does what a click on the card did. It
+  is saved like the chart style: on the router for every browser where
+  your login may, otherwise in this browser. **Full**, the path as
+  before, stays the default.
+- **Ports tile and Wired branch: a DSA switch's ports count what the
+  switch passes on by itself** (#156,
+  [@Vikk20](https://github.com/Vikk20)). On a router whose Ethernet
+  ports are a switch chip's under DSA, the kernel counts on each port
+  only what passes the router's CPU, so a port whose traffic the chip
+  forwards to another port (an access point plugged into it, a NAS)
+  read near zero. Where `ethtool` is installed, the dashboard now reads
+  the chip's own counters for its ports, one `ethtool -S` a port at
+  each poll, and shows those in the Ports tile, the Wired branch and
+  for a device that has a port to itself; a paired access point's
+  report carries its own. This is the one program the dashboard starts,
+  in a process of rpcd's, with nothing from the browser on its command
+  line, and the read permission `luci-app-vantage` grants the one call
+  more for it. `ethtool` is not a dependency: `apk add ethtool` (24.10:
+  `opkg install ethtool`). Without it, or without a DSA switch, nothing
+  changes and nothing is started. The counters are known for the
+  mt7530, qca8k, mv88e6xxx, b53, bcm_sf2, lantiq_gswip and rtl8366rb
+  drivers. See
+  [Packages on the router](docs/INSTALL.md#packages-on-the-router).
+- **Other access points: a device wired behind one counts in its
+  branch** (#153, [@Vikk20](https://github.com/Vikk20)). For the router
+  such a device sits on the port that leads to the access point, so the
+  router's Wired node counted it and listed it under a shared port. It
+  now belongs to the access point's own Wired node, and the router's
+  count and list leave it out.
+- **Network path: "+n more" opens the rest** (#154,
+  [@Vikk20](https://github.com/Vikk20)). A Wi-Fi or Wired node lists
+  five clients; a click on the "+n more" line under them now shows the
+  rest in place, and "Show fewer" folds them back.
+- **Other access points: their clients' Wi-Fi standard and channel
+  width** (#155, [@Vikk20](https://github.com/Vikk20)). A paired access
+  point's report now carries each station's link as the access point
+  sees it, so its clients show their Wi-Fi generation like the router's
+  own, once the access point runs this version of the add-on too. Update
+  the router first: these reports are larger, and a router still on
+  1.1.0 or 1.1.1 refuses the report of an access point with more than
+  about 150 clients.
+- **WireGuard tile: no long silence after the computer slept.** After a
+  slow answer the tile waits ten times as long before it asks again. A
+  call that was out while the computer slept counted as slow and could
+  leave the tile unasked for hours; such a call no longer counts, and
+  the wait is four minutes at most.
+- **Client details: "short GI" only where it is one.** Wi-Fi 6 and 7
+  links on their longer guard intervals (1.6 and 3.2 µs) were labelled
+  "short GI". The label now stands for Wi-Fi 4 and 5's short interval
+  alone.
+- **No second config file after an upgrade.** Once a device name or an
+  Appearance setting was saved, every upgrade left the package's own copy
+  beside it (`/etc/config/vantage-opkg` and `vantage_theme-opkg`, or
+  `vantage.apk-new` and `vantage_theme.apk-new` on 25.12). That copy holds
+  no setting; the dashboard's and the theme's installs now remove it.
+
+## 1.1.1 - 2026-11-21
+
+- **Speed units** ([#145](https://github.com/anothaDev/luci-theme-vantage/pull/145),
+  [@m38d1](https://github.com/m38d1)). A new option under Appearance,
+  between the network path's background and Low-power router: the
+  dashboard's traffic in Bits/s, as before, or in Bytes/s (B/s, kB/s,
+  MB/s). The cards, the charts and their axes, the client rows and Top
+  talkers follow it at once; link and Wi-Fi rates stay in bits, since
+  they are negotiated speeds, not traffic.
+- **Login page: a switch to stay on HTTP** (#137,
+  [@qiyuey](https://github.com/qiyuey)). Opened over plain HTTP, the
+  login page moves to HTTPS where the browser accepts the router's
+  certificate, as LuCI's base login page does (Bootstrap's does not). An
+  administrator can now switch that off:
+  `uci set luci.main.vantage_https='stay'`, then
+  `uci commit luci`. The default is unchanged. See
+  [Troubleshooting](docs/INSTALL.md#the-login-page-moves-from-http-to-https).
+
+## 1.1.0 - 2026-11-21
+
+- **Your other access points on the dashboard** (optional add-on
+  `luci-app-vantage-aps`; ideas from #5 by
+  [@nhAsif](https://github.com/nhAsif), #127 and #130 by
+  [@Vikk20](https://github.com/Vikk20)). Pair each OpenWrt access point
+  once under Network → Access points and the router's dashboard shows
+  its Wi-Fi networks, their clients and its wired hosts beside its own:
+  in the network path, in the Clients list and in a client's details.
+  An access point plugged into another is drawn under it. The router
+  reads each access point over SSH with a key that can do one thing
+  there, run a read-only report, and only from the access point whose
+  host key it pinned at pairing; nothing is broadcast on the network.
+  When an access point's address changes the router finds it again by
+  its MAC, on the network it was paired on, also after that network was
+  given another subnet. Seeing the paired access points needs its own
+  permission, `luci-app-vantage-aps-view`; pairing needs
+  `luci-app-vantage-aps`, for administrators. Install the add-on on the
+  router and on each access point:
+  `apk add luci-app-vantage-aps` (24.10: `opkg install
+  luci-app-vantage-aps`). See
+  [Other access points](docs/INSTALL.md#other-access-points-optional).
+- **Search finds clients, radios and networks** (Ctrl+K or `/`). On the
+  dashboard the command palette also lists clients by name, MAC or
+  address, radios by band or channel, Wi-Fi networks and interfaces,
+  and Enter opens what a click on them opens.
+- **WireGuard tile** (#129, [@nubbhr](https://github.com/nubbhr)).
+  Where a tunnel exists, a tile lists its peers with their name, the
+  time since the last handshake and their traffic. It reads LuCI's own
+  WireGuard status, so it shows for logins that may open that page; the
+  dashboard's own permissions are unchanged.
+- **Ports tile.** On a device with two Ethernet ports or more, a tile
+  with a cell for each port: its link and negotiated speed, its
+  traffic, how many wired hosts sit behind it, and a mark on the port a
+  line to the internet leaves through. Error, drop and collision
+  counters show only where they are not zero. It is read from what the
+  dashboard already polls. A saved layout may now hold twelve tiles.
+- **Top talkers on routers without Wi-Fi** (#129). Wired devices that
+  have a port to themselves are ranked with the Wi-Fi clients, and the
+  tile now exists on a wired-only device, whose default layout has five
+  tiles. The clients of a paired access point are not ranked: the
+  router counts their traffic on the access point's port, not per
+  device.
+- **Named devices that are offline.** A device you gave a name is no
+  longer gone from the Clients tile five minutes after it left: an
+  Offline filter lists the named devices that are not connected, with
+  their last address and when they were last seen where the page knows.
+- **Daily update check, if you want one** (#133,
+  [@HyperdrivzZ](https://github.com/HyperdrivzZ)). A new option under
+  Appearance, off by default and kept in this browser only: once a day
+  the browser reads the project's package list and puts a dot on the
+  gear when a newer version is out. It tells the list's host (GitHub
+  Pages) your computer's address, which is why it is off unless you
+  switch it on. Updating stays with the package manager.
+- **Attention in the tab's title.** While something needs attention the
+  dashboard's tab reads "(2) Dashboard · hostname", so a tab left in
+  the background shows it.
+- **"What's new" after an upgrade.** The first time a browser loads the
+  dashboard after an upgrade, one line links to this file; it goes when
+  closed or followed. Nothing is fetched for it.
+- **Details that were missing.** The uplink's details show the
+  delegated IPv6 prefix and say when the line sits behind another NAT
+  (a private or carrier-grade address); MAC and IP addresses have a
+  Copy button; the device's details list every temperature sensor and
+  the firmware's build date.
+- **No slow-link warning for a port that can do no better.** An uplink
+  under 1 Gbit/s warned for good on a router with Fast Ethernet ports
+  or behind a 100 Mbit/s modem. The warning now stays away when the
+  link runs at the fastest speed both ends offer.
+- **Qualcomm QSDK radios from the wireless config** (#138,
+  [@milkman-wang](https://github.com/milkman-wang)). On firmware whose
+  radios are driven by `qcawificfg80211` (QWRT) the dashboard listed no
+  Wi-Fi; it now reads the networks from the wireless configuration and
+  shows Wi-Fi 6 and 7 radios as such.
+- **Firewall overview: a negative prefix length is a rule in effect**
+  (#144, [@FanxJK](https://github.com/FanxJK)). A rule that matches an
+  address by its last bits, such as `::1234/-64`, was listed under "Not
+  in effect" as refused by firewall4, which loads it. The overview now
+  reads a prefix length the way firewall4 does.
+- **Tables: the title of an actions column lines up with its buttons**
+  (#143, [@VIKINGYFY](https://github.com/VIKINGYFY)). "Static Lease"
+  over the leases' buttons was right-aligned, apart from every other
+  title, wherever the button is the wider of the two.
+- **Smaller fixes.** A client's Radio row no longer prints "channel 0 ·
+  20 MHz" for a radio whose channel is not known; the storage check
+  reads the root filesystem by name.
+- **Translations.** German is new ([#142](https://github.com/anothaDev/luci-theme-vantage/pull/142),
+  [@bakaranadnan-a11y](https://github.com/bakaranadnan-a11y)): the
+  dashboard, the theme and the access points page, as
+  `luci-i18n-vantage-de`, `luci-i18n-vantage-theme-de` and
+  `luci-i18n-vantage-aps-de`. Russian covers the new texts and the
+  access points page (`luci-i18n-vantage-aps-ru`).
+
+## 1.0.21 - 2026-11-19
+
+- **Dashboard: the client lists keep their order** (#132,
+  [@comozen](https://github.com/comozen)). The Wi-Fi list was in order
+  of live traffic and the wired one in order of last heard, so the rows
+  changed places at every refresh. Both now start in name order, and the
+  column you click is remembered in that browser.
+- **Appearance: Motion when not in focus** (#131,
+  [@smallprogram](https://github.com/smallprogram)). Since 1.0.19
+  nothing moves while another window has the focus. A new option under
+  the gear, off by default, lets the dashboard, the refresh dot and the
+  login page keep moving then, for a dashboard kept in view beside other
+  work. A hidden tab, reduced motion and Low-power router still stop
+  motion.
+- **Network path: a device can no longer pass for the gateway by
+  claiming its address.** The dashboard took the last device that
+  claimed the gateway's address for the gateway, and one ARP packet from
+  any LAN or guest device was enough to claim it: that device was then
+  marked as the gateway among the wired hosts, and its port could be
+  taken for the uplink. The gateway is now the device the line itself
+  hears; where two cannot be told apart, none is marked. Not told apart:
+  a device on the uplink's own network that replaces the gateway's
+  entry (ARP spoofing).
+- **Network path: each line shows its own address** (#88). Two lines of
+  one provider, such as two PPPoE sessions, end at the same gateway, so
+  both showed the same address. A line now shows its own IPv4 address,
+  with the gateway in its tooltip and details; this device shows its LAN
+  address. An access point's path is unchanged.
+- **Tables: numbers and addresses stay on one line in every language**
+  (#111, [@VIKINGYFY](https://github.com/VIKINGYFY)). Under a translated
+  column title, a value such as a lease's remaining time ("11h 50m 29s")
+  wrapped.
+- **Dialogs: wide dialogs are wide again** (#128,
+  [@smallprogram](https://github.com/smallprogram)). The maps of banIP
+  and adblock and the Wireless scan ask for a dialog 90% wide; the theme
+  held them at its own width.
+- **Russian translation** (#135,
+  [@akorshun](https://github.com/akorshun)), dashboard and theme:
+  `apk add luci-i18n-vantage-ru luci-i18n-vantage-theme-ru` (24.10:
+  `opkg install` the same two). See
+  [Languages](docs/INSTALL.md#languages).
 
 ## 1.0.20 - 2026-11-12
 

@@ -16,6 +16,8 @@ const check = call('check');
 const upgrade = call('upgrade', [ 'version' ]);
 const configure = call('configure', [ 'mirror' ]);
 const setTrafficSource = call('set_traffic_source', [ 'source' ]);
+const setDashboard = call('set_dashboard', [ 'action', 'hero', 'sections', 'monitor', 'tiles', 'details' ]);
+const setSimpleMenu = call('set_simple_menu', [ 'action', 'common', 'system' ]);
 const setLogo = call('logo', [ 'action' ]);
 
 /* Must match the rpcd backend and its ACL (the only file cgi-upload may write). */
@@ -51,6 +53,8 @@ const errors = {
 	space: N_('Not enough temporary storage or unable to create update files.'),
 	state: N_('Unable to access update state storage.'),
 	invalid_source: N_('Choose a valid traffic source.'),
+	invalid_dashboard: N_('Invalid dashboard layout.'),
+	invalid_simple_menu: N_('Invalid simple menu configuration.'),
 	invalid_mirror: N_('Enter an HTTPS mirror prefix such as https://mirror.example.com/ (letters, digits and . _ ~ % + - only).'),
 	/* logo */
 	logo_missing: N_('The uploaded file did not reach the router. Try again.'),
@@ -60,6 +64,7 @@ const errors = {
 	logo_denied: N_('Permission denied. Log out and log in again once after updating Carbon, then retry.')
 };
 const message = code => errors[code] ? tr(errors[code]) : String(code || '');
+const sameVersion = (a, b) => !!a && !!b && String(a).replace(/-r?(\d+)$/, '-r$1') === String(b).replace(/-r?(\d+)$/, '-r$1');
 const writable = () => L.hasViewPermission();
 
 /* LuCI's E() renders a null array item as the text "null": never pass one */
@@ -179,6 +184,92 @@ function trafficSection(data) {
 	]);
 }
 
+function dashboardSection(data) {
+	let custom = !!data.dashboard_custom;
+	const state = E('span', { 'class': 'cb-update-note', 'role': 'status', 'aria-live': 'polite' });
+	const openLink = E('a', {
+		'class': 'cbi-button cbi-button-action',
+		'href': (typeof L.url === 'function' ? L.url('admin', 'status', 'overview') : '#') + '#customize'
+	}, tr('Customize on Overview'));
+	const resetButton = E('button', {
+		'type': 'button',
+		'class': 'cbi-button cbi-button-reset',
+		'click': async () => {
+			resetButton.disabled = true;
+			state.textContent = tr('Saving…');
+			try {
+				const result = await setDashboard('reset', '', '', '', '', '');
+				if (result && result.error) state.textContent = message(result.error);
+				else { custom = false; state.textContent = tr('Default dashboard layout restored.'); }
+			}
+			catch (e) {
+				state.textContent = /denied|forbidden|403|-32002|ubus code 6/i.test(String(e && e.message || e)) ? message('logo_denied') : e.message;
+			}
+			finally { resetButton.disabled = !custom || !writable(); }
+		}
+	}, tr('Restore default'));
+	state.textContent = custom ? tr('Using a custom dashboard layout.') : tr('Using the default dashboard layout.');
+	resetButton.disabled = !custom || !writable();
+	return section(tr('Dashboard layout'), tr('Choose which panels appear on Overview and arrange them in sections. Saved on this router across devices and firmware upgrades.'), [
+		actions([openLink, resetButton, state])
+	]);
+}
+
+function simpleMenuSection(data) {
+	let custom = !!data.simple_menu_custom;
+	const canOpen = !!(window.Carbon && typeof window.Carbon.openSimpleMenuCustomizer === 'function');
+	const state = E('span', { 'class': 'cb-update-note', 'role': 'status', 'aria-live': 'polite' });
+	const openButton = E('button', {
+		'type': 'button',
+		'class': 'cbi-button cbi-button-action',
+		'click': () => {
+			if (window.Carbon && typeof window.Carbon.openSimpleMenuCustomizer === 'function')
+				window.Carbon.openSimpleMenuCustomizer(openButton);
+		}
+	}, tr('Customize simple menu'));
+	const resetButton = E('button', {
+		'type': 'button',
+		'class': 'cbi-button cbi-button-reset',
+		'click': async () => {
+			openButton.disabled = resetButton.disabled = true;
+			state.textContent = tr('Saving…');
+			try {
+				const result = await setSimpleMenu('reset', '', '');
+				if (result && result.error) state.textContent = message(result.error);
+				else {
+					custom = false;
+					if (window.Carbon && typeof window.Carbon.setSimpleMenuAttr === 'function')
+						window.Carbon.setSimpleMenuAttr('');
+					state.textContent = tr('Default simple menu restored.');
+				}
+			}
+			catch (e) {
+				state.textContent = /denied|forbidden|403|-32002|ubus code 6/i.test(String(e && e.message || e)) ? message('logo_denied') : e.message;
+			}
+			finally {
+				openButton.disabled = !canOpen || !writable();
+				resetButton.disabled = !custom || !writable();
+			}
+		}
+	}, tr('Restore default'));
+	const paintState = () => {
+		state.textContent = !canOpen ? tr('Switch to Carbon theme to customize the simple menu.') :
+			(custom ? tr('Using a custom simple menu.') : tr('Using the default simple menu.'));
+		openButton.disabled = !canOpen || !writable();
+		resetButton.disabled = !custom || !writable();
+	};
+	if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+		document.addEventListener('carbon:simple-menu-change', (e) => {
+			custom = !!(e && e.detail && e.detail.custom);
+			paintState();
+		});
+	}
+	paintState();
+	return section(tr('Simple menu'), tr('Choose which pages appear in the Simple sidebar and arrange their order. Saved on this router across devices and firmware upgrades.'), [
+		actions([openButton, resetButton, state])
+	]);
+}
+
 /* ---- download mirror for online updates ---- */
 function mirrorSection(data) {
 	const input = E('input', {
@@ -250,7 +341,7 @@ function updateSections(data) {
 		};
 		stateText.textContent = labels[value.state] ? tr(labels[value.state]) :
 			value.can_upgrade ? tr('A new version is available.') :
-			value.latest && value.current === value.latest ? tr('You are using the latest version.') : tr('Check the latest stable Carbon release.');
+			sameVersion(value.current, value.latest) ? tr('You are using the latest version.') : tr('Check the latest stable Carbon release.');
 		const issue = value.error || value.reason;
 		errorText.textContent = message(issue); errorText.hidden = !issue;
 		securityText.textContent = value.manager === 'apk' ?
@@ -313,6 +404,8 @@ return view.extend({
 			E('p', { 'class': 'cbi-map-descr' }, tr('Personalise the logo and update the theme without changing your router configuration.')),
 			logoSection(data),
 			trafficSection(data),
+			dashboardSection(data),
+			simpleMenuSection(data),
 			updates.main,
 			updates.notes,
 			mirrorSection(data),

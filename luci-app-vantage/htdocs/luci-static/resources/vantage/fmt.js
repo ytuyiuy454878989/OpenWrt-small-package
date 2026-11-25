@@ -20,6 +20,10 @@ function sig3(v) {
    emoji presentation selectors are kept. */
 var UNSAFE_TEXT = /[\u0000-\u001f\u007f-\u009f\u00ad\u034f\u061c\u115f\u1160\u17b4\u17b5\u180e\u200b\u200e\u200f\u2028-\u202e\u2060-\u206f\u3164\ufe00-\ufe0d\ufeff\uffa0\ufff9-\ufffb]|\uDB40[\uDC00-\uDC7F]/g;
 
+/* the unit traffic reads in: bits (as always) or bytes, as the Vantage
+   theme's Appearance picked (the dashboard sets it from data-vt-units) */
+var SPEED_UNITS = 'bits';
+
 return baseclass.extend({
 	DASH: DASH,
 
@@ -33,11 +37,37 @@ return baseclass.extend({
 		return t;
 	},
 
-	/* bits per second -> { v: '372', u: 'Mbit/s' } */
-	bitsParts: function(bps) {
+	/* "Dropped: 0 in · 3 out" as its label and the rest, at the first
+	   colon (Chinese's too), so that a narrow cell can break between the
+	   two (#168): [ 'Dropped: ', '0 in · 3 out' ]; a text without one: [ text ] */
+	labelled: function(text) {
+		var m = /^(.*?[:\uff1a]\s*)(.+)$/.exec(String(text == null ? '' : text));
+		return m ? [ m[1], m[2] ] : [ String(text == null ? '' : text) ];
+	},
+
+	/* the traffic's unit, 'bits' or 'bytes' */
+	speedUnits: function() { return SPEED_UNITS; },
+
+	setSpeedUnits: function(u) { if (u === 'bytes' || u === 'bits') SPEED_UNITS = u; },
+
+	/* the parts, always in bits: link and PHY rates are negotiated
+	   bitrates, so they don't follow the traffic unit pick */
+	bitParts: function(bps) {
 		bps = num(bps);
 		if (bps == null || bps < 0) return { v: DASH, u: '' };
 		var u = [ _('bit/s', 'vantage'), _('kbit/s', 'vantage'), _('Mbit/s'), _('Gbit/s', 'vantage'), _('Tbit/s') ], i = 0;
+		while (bps >= 1000 && i < u.length - 1) { bps /= 1000; i++; }
+		return { v: i === 0 ? bps.toFixed(0) : sig3(bps), u: u[i] };
+	},
+
+	/* bits per second -> { v: '372', u: 'Mbit/s' }; as bytes (the theme's
+	   Appearance) the same traffic reads /8, in decimal B/s steps */
+	bitsParts: function(bps) {
+		if (SPEED_UNITS !== 'bytes') return this.bitParts(bps);
+		bps = num(bps);
+		if (bps == null || bps < 0) return { v: DASH, u: '' };
+		bps /= 8;
+		var u = [ _('B/s', 'vantage'), _('kB/s', 'vantage'), _('MB/s', 'vantage'), _('GB/s', 'vantage'), _('TB/s', 'vantage') ], i = 0;
 		while (bps >= 1000 && i < u.length - 1) { bps /= 1000; i++; }
 		return { v: i === 0 ? bps.toFixed(0) : sig3(bps), u: u[i] };
 	},
@@ -87,7 +117,8 @@ return baseclass.extend({
 	phyRate: function(kbit) {
 		kbit = num(kbit);
 		if (kbit == null || kbit <= 0) return DASH;
-		return this.bits(kbit * 1000);
+		var p = this.bitParts(kbit * 1000);
+		return p.u ? p.v + ' ' + p.u : p.v;
 	},
 
 	pct: function(p, digits) {
@@ -117,6 +148,18 @@ return baseclass.extend({
 		if (s < 60) return _('%d s ago', 'vantage').format(s);
 		if (s < 3600) return _('%d min ago', 'vantage').format(Math.floor(s / 60));
 		return _('%d h ago', 'vantage').format(Math.floor(s / 3600));
+	},
+
+	/* whole days since -> 'today', '12 days ago', '5 months ago', '3 years
+	   ago': days for two months, months for two years, then full years */
+	daysAgo: function(d) {
+		d = num(d);
+		if (d == null || d < 0) return DASH;
+		d = Math.floor(d);
+		if (d < 1) return _('today');
+		if (d < 60) return this.N_(d, '%d day ago', '%d days ago').format(d);
+		if (d < 731) return this.N_(Math.round(d / 30.44), '%d month ago', '%d months ago').format(Math.round(d / 30.44));
+		return this.N_(Math.floor(d / 365.25), '%d year ago', '%d years ago').format(Math.floor(d / 365.25));
 	},
 
 	dbm: function(v) {
@@ -150,13 +193,16 @@ return baseclass.extend({
 		return /^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(m) ? m.slice(12) : '';
 	},
 
-	/* Client- or radio-supplied text for display: invisible/reordering
-	   characters become U+FFFD and long values are cut (by code point) with
-	   an ellipsis. The result is still only ever used as a text node. */
+	/* Client- or radio-supplied text for display: control, reordering and
+	   a list of zero-width characters (UNSAFE_TEXT) become U+FFFD and long
+	   values are cut (by code point) with an ellipsis. The result is still
+	   only ever used as a text node. Only the first 2 * maxLen + 2 code
+	   units are read: each code point takes two at most, and one becomes
+	   one, so the rest cannot change the result */
 	safeText: function(s, maxLen) {
 		if (s == null) return '';
-		var chars = Array.from(String(s).replace(UNSAFE_TEXT, '\ufffd'));
 		maxLen = maxLen > 1 ? maxLen : 64;
+		var chars = Array.from(String(s).slice(0, 2 * maxLen + 2).replace(UNSAFE_TEXT, '\ufffd'));
 		return chars.length > maxLen ? chars.slice(0, maxLen - 1).join('') + '…' : chars.join('');
 	},
 

@@ -15,16 +15,19 @@
 <br>
 
 <p align="center">
-  <a href="https://anothadev.github.io/luci-theme-vantage/"><img src="docs/screenshots/vantage-promo.webp" alt="A ten-second tour of Vantage: the dark dashboard with live charts and the network path, a client's details, Ctrl K search, and the switch from dark to light" width="100%"></a>
+  <a href="https://anothadev.github.io/luci-theme-vantage/"><img src="docs/screenshots/vantage-promo.webp" alt="A twenty-second tour of Vantage: the live dashboard, a warning and the client behind it, a router with its access points, WireGuard peers and ports, the firewall overview, Ctrl K search, restyled LuCI pages, dark and light, and the phone layout" width="100%"></a>
 </p>
 
 <p align="center"><sub>The video and screenshots use recorded data with addresses and names
-replaced. The larger access point further down is generated.</sub></p>
+replaced. The router and the larger access point are generated.</sub></p>
 
 ## What you get
 
 Two packages that work together or alone: the theme doesn't need the
-dashboard, and the dashboard on its own works under any LuCI theme.
+dashboard, and the dashboard on its own works under any LuCI theme. A
+third, optional one adds your other access points to the dashboard, and
+a fourth, optional and experimental, the traffic of devices that share a
+port.
 
 **The dashboard** (`luci-app-vantage`) is the page you land on after login.
 
@@ -33,39 +36,72 @@ dashboard, and the dashboard on its own works under any LuCI theme.
   the details.
 - **A live network path.** Your internet lines, this device, its radios
   and SSIDs, and its wired ports, with packets that move at the real
-  uplink rate. Click anything for details.
+  uplink rate. Click anything for details. On a big network, **Compact**
+  under Customize makes every network, port and access point one line.
+- **Your other access points too** (optional add-on,
+  `luci-app-vantage-aps`). Pair each access point once and the router's
+  dashboard shows its SSIDs, clients and wired devices beside its own.
+  The router reads them over SSH with a key that can only fetch that
+  report; nothing is shared until you pair.
+- **Traffic per device, also behind a switch** (optional add-on
+  `luci-app-vantage-traffic`, experimental). On a router, devices that
+  share a port get the traffic that passes the router for each of them,
+  from the router's own connection tracking. No firewall rules.
 - **Every client, by name.** Your alias, a name from DHCP, mDNS, WPS or
   reverse DNS, or else the vendor. You get signal, link rate, Wi-Fi
   generation, live traffic and an experience score that explains itself.
-  Wired devices are listed too, with their port and link speed.
+  Wired devices are listed too, with their port and link speed, and a
+  device you named stays in the list while it's offline.
 - **Live charts.** Five minutes of throughput for the uplink and every
-  radio, in the chart style you choose, plus radio cards, top talkers and
-  a system tile.
+  radio, in the chart style you choose, plus radio cards, top talkers
+  (Wi-Fi clients, and wired devices that have a port to themselves, so a
+  router without Wi-Fi has them too) and a system tile.
+- **WireGuard peers.** Where a tunnel is up, a tile lists its peers by
+  name, with the time since their last handshake and their live traffic.
+  For logins that may open LuCI's own WireGuard status.
+- **Every port.** On a device with two Ethernet ports or more, a tile
+  shows each one: link and speed, live traffic, the wired devices behind
+  it and which port your internet line leaves through. Errors and drops
+  show up only where there are any. With `ethtool` installed, the ports
+  of a switch chip (DSA) also count what the chip forwards by itself.
 - **Firewall overview.** What's open from the internet, which zones reach
   which, and warnings for risky setups. Every item links to the LuCI page
   that changes it.
 - **Your own layout.** Drag, resize or hide tiles, with one layout per
   screen size. With the Vantage theme, your layout and chart style are
   saved on the router, so every browser matches.
+- **Tiles from other packages** (experimental). Another package can add a
+  read-only tile of its own. The dashboard draws it in its own look and
+  marks it with the package's id; see [`docs/TILES.md`](docs/TILES.md).
+- **Settings that fit your router.** With the Vantage theme, Appearance
+  shows traffic in bits or bytes per second, and its Low-power router
+  mode asks for the slow parts only every 30 seconds and stops the
+  motion.
 
 **The theme** (`luci-theme-vantage`) restyles every LuCI page.
 
 - **Quick to get around.** An icon rail, breadcrumbs, and
   <kbd>Ctrl</kbd>+<kbd>K</kbd> or <kbd>/</kbd> to search every page you
-  can open.
+  can open. On the dashboard the search also finds clients, radios, Wi-Fi
+  networks and interfaces.
 - **Good on phones.** A bottom bar replaces the rail, and tables become
   cards.
 - **Light, dark or auto**, with no flash on load. Your choice and your
   background picks are saved on the router, so every browser matches.
 - **Tidier stock pages.** One control size, one tab style, field help
-  folded to its first line, spare row actions tucked into a ⋯ menu, and
-  coloured firewall verdicts.
+  folded to its first line, spare row actions tucked into a ⋯ menu,
+  coloured firewall verdicts, and Status → Firewall as a flow chart of
+  the way a packet takes.
 - **Its own login page**, with moving packets, a starfield or nothing.
 
 Nothing loads from the internet: Vantage uses system fonts and its own
 icons, with no CDNs or frameworks. The one exception is **Check for
-updates** under Appearance, and only when you click it. The dashboard's only write is device
-names, and it never reads Wi-Fi keys. See [Security](#security).
+updates** under Appearance, and only when you click it, or once a day in
+a browser where you switch **Daily update check** on (off by default; it
+shows GitHub Pages your computer's IP address and the address you opened
+LuCI at). The dashboard's only writes are the names you give devices
+and their "Don't warn about its signal" marks, and it never reads Wi-Fi
+keys. See [Security](#security).
 
 ## Install
 
@@ -93,8 +129,8 @@ apk add luci-theme-vantage luci-app-vantage
 stands for your router's address.
 
 ```sh
-f=$(awk '/ luci-(theme|app)-vantage-.*\.apk$/ {print $2}' SHA256SUMS) &&
-grep -E ' luci-(theme|app)-vantage-.*\.apk$' SHA256SUMS | sha256sum -c - &&
+f=$(awk '/ luci-(theme|app)-vantage-[0-9].*\.apk$/ {print $2}' SHA256SUMS) &&
+grep -E ' luci-(theme|app)-vantage-[0-9].*\.apk$' SHA256SUMS | sha256sum -c - &&
 ssh root@192.0.2.1 'mkdir -m 700 /tmp/vantage' &&
 scp -O $f root@192.0.2.1:/tmp/vantage/ &&
 ssh root@192.0.2.1 'apk add --no-network --allow-untrusted /tmp/vantage/*.apk; s=$?; rm -r /tmp/vantage; exit $s'
@@ -125,28 +161,50 @@ ready-made prompt for installing with a coding agent.
     <td align="center"><sub>Client details: experience score, signal and link info</sub></td>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/screenshots/palette.png" alt="Command palette listing pages and Appearance actions that match a search"></td>
-    <td width="50%"><img src="docs/screenshots/network-path.png" alt="Network path of a quad-radio access point with ten SSIDs and a Wired branch of six ports"></td>
+    <td width="50%" valign="middle"><img src="docs/screenshots/network-path.png" alt="Network path of a quad-radio access point with ten SSIDs and a Wired branch of six ports"></td>
+    <td width="50%"><img src="docs/screenshots/router.png" alt="Dashboard of a router without Wi-Fi: two internet lines, its own networks and switch ports, and three paired access points with their Wi-Fi networks, clients and wired devices"></td>
   </tr>
   <tr>
-    <td align="center"><sub><kbd>Ctrl</kbd>+<kbd>K</kbd> search over pages and Appearance options</sub></td>
     <td align="center"><sub>A larger access point (generated): four radios, ten networks, six wired ports</sub></td>
+    <td align="center"><sub>A router (generated): two internet lines and its paired access points</sub></td>
   </tr>
   <tr>
+    <td width="50%" valign="middle"><img src="docs/screenshots/compact-path.png" alt="The same quad-radio access point with the compact network path: every radio, network and port is one line with its clients and rates"></td>
+    <td width="50%"><img src="docs/screenshots/wireguard-ports.png" alt="Lower part of the router's dashboard: the WireGuard tile with two tunnels and their peers, and the Ports tile with two internet ports and two switch ports"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>That access point's path in compact form: one line each</sub></td>
+    <td align="center"><sub>Further down the router's dashboard: WireGuard peers and every port</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/firewall-overview.png" alt="Firewall overview of the router: a warning that SSH is open to the internet, what is open on the router and forwarded into the network, the zones with where each forwards, and a port forward that is switched off"></td>
+    <td width="50%"><img src="docs/screenshots/firewall-flow.png" alt="LuCI's Status Firewall page as a flow chart of the chains a packet passes, with the input and forward chains' rules below"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Firewall overview of that router: what's open from the internet, the zones, and a warning</sub></td>
+    <td align="center"><sub>LuCI's Status → Firewall page as a flow chart</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/palette.png" alt="Command palette listing the Wi-Fi networks, clients, pages and Appearance options that match a search"></td>
     <td width="50%"><img src="docs/screenshots/status-overview.png" alt="LuCI Status Overview page restyled by the theme"></td>
-    <td width="50%"><img src="docs/screenshots/channel-analysis.png" alt="Channel Analysis page showing neighbouring networks"></td>
   </tr>
   <tr>
+    <td align="center"><sub><kbd>Ctrl</kbd>+<kbd>K</kbd> search over networks, clients, pages and Appearance options</sub></td>
     <td align="center"><sub>LuCI's Status page under the theme, with a combined memory bar</sub></td>
-    <td align="center"><sub>LuCI's Channel Analysis page (neighbouring networks are generated)</sub></td>
   </tr>
   <tr>
+    <td width="50%"><img src="docs/screenshots/channel-analysis.png" alt="Channel Analysis page showing neighbouring networks"></td>
     <td width="50%" valign="middle"><img src="docs/screenshots/login.png" alt="The theme's login page with moving packet traces on a dark grid"></td>
-    <td width="50%" align="center"><img src="docs/screenshots/mobile.png" alt="Dashboard on a phone-sized screen" width="40%"></td>
   </tr>
   <tr>
+    <td align="center"><sub>LuCI's Channel Analysis page (neighbouring networks are generated)</sub></td>
     <td align="center"><sub>Login page with grid packets, a starfield or nothing</sub></td>
-    <td align="center"><sub>Phone layout with the bottom bar and Wi-Fi/Wired switch</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="docs/screenshots/mobile.png" alt="Dashboard on a phone-sized screen" width="20%"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><sub>Phone layout with the bottom bar and Wi-Fi/Wired switch</sub></td>
   </tr>
 </table>
 
@@ -155,18 +213,44 @@ ready-made prompt for installing with a coding agent.
 Vantage is built to read your router, not change it. The full rules are in
 the [spec](docs/SPEC.md#6-security-requirements).
 
-- **The dashboard only reads.** Its permissions cover read methods and
-  can't run commands. Its one write is device names, stored in
+- **The dashboard only reads.** Its permissions cover read methods. The
+  one program they can start is `ethtool -S` for the device's own DSA
+  switch ports, where `ethtool` is installed, with nothing from the
+  browser on its command line. Its only writes are device names and a
+  device's "Don't warn about its signal" mark, both stored in
   `/etc/config/vantage`.
 - **Wi-Fi keys stay out.** Wireless settings come through Vantage's own
   plugin, which leaves out Wi-Fi keys, SAE passwords and RADIUS secrets.
 - **The theme writes one file.** Appearance, and the dashboard's layout
   and chart style, go to `/etc/config/vantage_theme` and nowhere else. A
   user without that permission keeps their picks in their own browser.
-- **Extras are separate permissions.** Renaming devices
-  (`luci-app-vantage-names`) and reverse DNS (`luci-app-vantage-rdns`) are
-  their own groups, so you can leave them out. The firewall overview only
-  appears for users who already hold LuCI's firewall permission.
+- **Other access points are opt-in.** The optional `luci-app-vantage-aps`
+  is the one part that does more than read: pairing creates the router's
+  own SSH key and, on an access point, adds that key to Dropbear limited
+  to one read-only report command. It has its own permission
+  (`luci-app-vantage-aps`), meant for administrators. Seeing the paired
+  access points on the dashboard is a second one
+  (`luci-app-vantage-aps-view`), since asking for their reports makes the
+  router log in to them with that key; the dashboard's own read
+  permission does not include it.
+- **Per-device traffic is opt-in.** The experimental
+  `luci-app-vantage-traffic` reads the router's connection table and
+  neighbour tables, in a process of its own, never changing a setting;
+  it keeps its counters in RAM, readable by root alone. Its answer is a
+  MAC address and two byte counts per device, and it has its own permission
+  (`luci-app-vantage-traffic`), since it shows how much each device
+  sends and receives.
+- **Extras are separate permissions.** Naming devices and silencing a
+  device's signal warning (`luci-app-vantage-names`) and reverse DNS
+  (`luci-app-vantage-rdns`) are their own groups, so you can leave them
+  out. The firewall overview only
+  appears for users who already hold LuCI's firewall permission, and the
+  WireGuard tile for those who hold LuCI's WireGuard one.
+- **Tiles from other packages are text.** A package may add a read-only
+  tile (experimental, [`docs/TILES.md`](docs/TILES.md)). The dashboard
+  asks it one fixed question, only for logins that hold that package's
+  own permission, and draws the answer itself, as text, with the
+  package's id beside the tile's name.
 - **Checked by tests.** They reject HTML built from data, render the
   theme's templates with hostile input, confirm the permissions match what
   the code calls, and keep real addresses, MACs and SSIDs out of the
@@ -185,14 +269,16 @@ behaviour, tracked in [`docs/luci-contract.md`](docs/luci-contract.md).
 
 ## Languages
 
-Vantage is available in English and Simplified Chinese (dashboard
-translation by [@ntbowen](https://github.com/ntbowen)). Each language
+Vantage is available in English, Simplified Chinese (dashboard
+translation by [@ntbowen](https://github.com/ntbowen)), Russian
+([@akorshun](https://github.com/akorshun)) and German
+([@bakaranadnan-a11y](https://github.com/bakaranadnan-a11y)). Each language
 installs as its own packages, for example
 `apk add luci-i18n-vantage-zh-cn luci-i18n-vantage-theme-zh-cn`; see
 [Languages](docs/INSTALL.md#languages) in the install guide.
 
 Translations are very welcome. In a fork, run
-`dev/i18n/update.sh --add <lang>`, translate the two new `.po` files and
+`dev/i18n/update.sh --add <lang>`, translate the new `.po` files and
 open a pull request that touches only `po/` files.
 [Translations](CONTRIBUTING.md#translations) has the details.
 
@@ -201,7 +287,7 @@ open a pull request that touches only `po/` files.
 With podman and the official OpenWrt SDK image:
 
 ```sh
-dev/build/sdk-build.sh 25.12.4          # builds HEAD into dist/25.12.4/
+dev/build/sdk-build.sh 25.12.6          # builds HEAD into dist/25.12.6/
 ```
 
 The same commit and SDK always produce byte-identical packages, and each
@@ -227,6 +313,8 @@ node dev/replay/server.js --mirror ../vantage-mirror --port 8106 --demo \
 [`docs/SPEC.md`](docs/SPEC.md) describes the product, and
 [`docs/luci-contract.md`](docs/luci-contract.md) lists what LuCI expects
 from a theme. Coding agents should read [`AGENTS.md`](AGENTS.md).
+To put a tile of your own package on the dashboard, see
+[`docs/TILES.md`](docs/TILES.md) (experimental).
 
 ## Contributing
 

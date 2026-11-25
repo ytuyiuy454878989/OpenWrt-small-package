@@ -18,7 +18,9 @@ A clean, glass-style LuCI theme for OpenWrt — built for everyday users.
 
 **[Live demo](https://mrjoechen.github.io/luci-theme-carbon/) · [English demo](https://mrjoechen.github.io/luci-theme-carbon/?lang=en)**
 
-https://github.com/user-attachments/assets/b78ccf2b-679e-459b-88ea-b4f82da6e03f
+<p align="center"><img src="docs/screenshots/intro.png" alt="Carbon desktop and mobile preview" width="100%"></p>
+
+https://github.com/user-attachments/assets/d6d8d161-65fa-456c-acbc-d3b2c0737bd9
 
 </div>
 
@@ -31,18 +33,17 @@ https://github.com/user-attachments/assets/b78ccf2b-679e-459b-88ea-b4f82da6e03f
 
 ## Features
 
-- **Dashboard** on *Status → Overview*: live traffic chart for any interface, CPU / memory / storage rings, memory breakdown, load sparkline, connection count, uptime, temperature sensors (thermal zones and hwmon), WAN IPv4/IPv6, connected devices and interface status. LuCI's original status widgets are kept behind *Show detailed status* and stop polling while collapsed.
-- **Device upload/download speeds** use `nlbwmon` by default, at its configured interval (normally 30 seconds, minimum display interval 5 seconds). Carbon never probes nftables in this mode, even if `nlbwmon` is unavailable. To sample nftables every 5 seconds, configure named counters and select **nftables** under **System → Carbon Theme Settings**. Anonymous counters require migration. If the selected source fails, the device list stays available. Initial samples, missing records and counter resets show `—`. Reads pause while the page is hidden. DHCP leases update independently. [Counter setup and accounting limits](docs/device-traffic.md)
-- **Discovered devices** — DHCPv4/v6 leases, Wi‑Fi stations (band and signal) and IPv4 ARP neighbours are merged by MAC. Discovery still works with the local DHCP server disabled, including when LAN obtains its own address by DHCP. Gateways, neighbour entries and DHCP leases are labelled separately; a missing local lease does not imply a fixed IP. Devices are recognised by hostname and MAC vendor prefix (35 brands, ~9,200 IEEE OUI prefixes). The count includes devices known to this router, possibly offline ones, and is not a live census of the entire network. Recognisable separate uplinks are excluded; a gateway sharing LAN is retained and labelled. Without an interface named `lan`, custom interface roles may be ambiguous, so discoveries on those interfaces are retained.
-- **Simple / Pro navigation** — *Simple* shows only the pages most people need (overview, internet, Wi‑Fi, software, password, backup, reboot); *Pro* shows the full LuCI menu with an icon for every page.
-- **Frosted-glass sidebar** that collapses into an icon rail (button on the sidebar edge or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>\\</kbd>); hovering a rail icon opens its sub-menu.
-- **Light / dark / auto** theme switch (top-right) and a **language switch** (bottom-left) for every installed LuCI language. Theme strings ship in English, Simplified and Traditional Chinese, German, Spanish, French, Italian, Japanese, Korean, Brazilian Portuguese, Russian, Turkish and Vietnamese; more can be added as gettext files in `po/`.
-- **Keyboard and touch friendly** — arrow keys in segmented controls, a focus-managed phone drawer, and rail sub-menus that open with a tap, <kbd>Enter</kbd> or <kbd>→</kbd>.
-- **Mobile friendly** — drawer navigation and tables that reflow into cards.
-- **Custom logo** — upload a PNG, JPEG, WebP, GIF or SVG in *System → Carbon Theme Settings*. It replaces the sidebar, login, overview and browser-tab logo, and is kept across theme and firmware upgrades. SVGs with scripts or embedded content are rejected.
-- **Online updates** — check and install stable releases from *System → Carbon Theme Settings*, optionally through an HTTPS download mirror. APK signatures remain verified; download size and SHA-256 are checked against GitHub before installation.
-- Existing LuCI pages and plugins keep working;
-- Architecture independent: one theme package for every router.
+- **Dashboard**: live traffic charts, CPU / memory / storage gauges, temperature, Wi‑Fi, and interface status panels; supports presets, toggling, and reordering (saved in UCI) while keeping LuCI's original status view.
+- **Device upload/download speeds**: uses `nlbwmon` by default, with optional 5-second `nftables` named-counter sampling ([setup guide](docs/device-traffic.md)).
+- **Discovered devices**: merges DHCP leases, Wi‑Fi stations (band and signal), and ARP neighbours by MAC, works without local DHCP, and recognises 35 device brands.
+- **Simple / Pro navigation**: *Simple* keeps everyday pages up front and lets you pin, remove, and reorder any installed LuCI page or plugin (saved in UCI); *Pro* shows the full LuCI menu with an icon for every page.
+- **Frosted-glass sidebar**: collapses into an icon rail (<kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>\\</kbd>) with hover or click sub-menus.
+- **Themes & languages**: light / dark / auto mode switch and a built-in language switcher for all installed LuCI languages (13 built-in theme translations).
+- **Keyboard & touch friendly**: arrow-key controls, focus-managed phone drawer, and rail sub-menus accessible via tap or keyboard.
+- **Mobile friendly**: drawer navigation and tables that reflow into cards.
+- **Custom logo**: upload common image formats or safe SVGs in theme settings to replace icons across pages and browser tabs; preserved across upgrades.
+- **Online updates**: check and install stable releases from theme settings with optional HTTPS mirrors, signature verification, and SHA-256 checks.
+- **Broad compatibility**: existing LuCI pages and plugins keep working; one architecture-independent package for every router.
 
 ## Installation & Usage
 
@@ -53,7 +54,7 @@ https://github.com/user-attachments/assets/b78ccf2b-679e-459b-88ea-b4f82da6e03f
 | OpenWrt / ImmortalWrt 23.05, 24.10 | opkg | `.ipk` or install script |
 | OpenWrt / ImmortalWrt 25.x, snapshot | apk | `.apk` or install script |
 
-Requires the ucode-based LuCI (23.05 or newer).
+Requires the ucode-based LuCI (23.05 or newer). The same `.ipk` package and online updater work on OpenWrt 23.05 (including stock 23.05 BusyBox without `setsid` and 23.05 SDK builds) and 24.10.
 
 All files are on the [Releases](https://github.com/mrjoechen/luci-theme-carbon/releases/latest) page.
 
@@ -116,11 +117,12 @@ Carbon becomes the default theme. Refresh the page, then **log out and log in on
 
 | What | Where |
 |---|---|
-| Simple / Pro menu | segmented control at the top of the sidebar |
+| Simple / Pro menu | segmented control at the top of the sidebar (*Customize menu* in Simple mode or System → Carbon Theme Settings → Simple menu to pin and reorder pages, saved in UCI) |
 | Collapse sidebar | round button on the sidebar edge, or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>\\</kbd> |
 | Light / dark / auto | top-right of the toolbar |
 | Language | bottom-left of the sidebar (changes LuCI's language, same as *System → Language*; a list when more than two are installed) |
-| Live traffic interface | picker in the *Live Traffic* card: *Auto* follows the WAN; any interface or network device (e.g. an xPON port such as `pon0` that also carries IPTV) can be picked, remembered per browser |
+| Live traffic interface | picker in each *Live Traffic* card: *Auto* follows the WAN; any interface or network device (e.g. an xPON port such as `pon0` that also carries IPTV) can be picked; add up to four cards in *Customize* |
+| Customize dashboard | *Customize* button under the dashboard (or reset in System → Carbon Theme Settings → Dashboard layout); saved in UCI (`/etc/config/carbon`) |
 | Check and install theme updates | System → Carbon Theme Settings (Simple and Pro modes) |
 | Custom logo | System → Carbon Theme Settings → Logo (*Restore default* undoes it) |
 | LuCI's original status page | *Show detailed status* under the dashboard |
@@ -129,11 +131,11 @@ Carbon becomes the default theme. Refresh the page, then **log out and log in on
 
 Install v1.1.0 or newer through the native package manager once. Open **System → Carbon Theme Settings** (**Carbon Update** in v1.1.0), click **Check for updates**, then **Install update** and confirm. The page shows release notes, progress and installation logs; refreshing it resumes monitoring. Theme preferences and router configuration are retained. Same-version installs, downgrades and expired update requests are rejected.
 
-APK updates verify the bundled Carbon public key, then use APK's normal signature verification again during installation. They use already-installed dependencies without fetching firmware indexes. This does not change `/etc/apk/keys`; standard LuCI package uploads still need the one-time key import above. IPK updates use HTTPS plus the release asset's SHA-256 and size checks. Update checks need router access to GitHub and correct system time. See [online update details](docs/online-update.md).
+APK updates verify the bundled Carbon public key, then use APK's normal signature verification again during installation. They use already-installed dependencies without fetching firmware indexes. This does not change `/etc/apk/keys`; standard LuCI package uploads still need the one-time key import above. IPK updates use HTTPS plus the release asset's SHA-256 and size checks. Updates check GitHub first and automatically fall back to the release manifest and packages hosted on GitHub Pages if GitHub API is rate-limited, unreachable or times out (correct system time is required). See [online update details](docs/online-update.md).
 
-If GitHub downloads are slow or blocked, enter an HTTPS **Download mirror** prefix on the same page. Only the package bytes use the mirror; version, size and SHA-256 still come from GitHub, and the updater falls back to GitHub if the mirror fails.
+If GitHub downloads are slow or blocked, enter an HTTPS **Download mirror** prefix on the same page. Only the package bytes use the mirror; version, size and SHA-256 come from GitHub (or the official GitHub Pages fallback), and if the mirror fails the updater tries GitHub Releases and then GitHub Pages.
 
-Required packages: `curl`, `ca-bundle`, `flock` (installed as native package dependencies). Installs made with `--files` or with installers before v1.1.3 are not registered with apk/opkg; run the current `carbon-install.sh` once to enable online updates.
+Required packages: `curl`, `ca-bundle`, `flock` (installed as native package dependencies; `setsid` is not required on OpenWrt 23.05). OpenWrt 23.05 SDK packages whose versions omit the `-r` prefix (such as `1.1.8-1`) are also recognised and can upgrade cleanly to official `-rN` releases. Installs made with `--files` or with installers before v1.1.3 are not registered with apk/opkg; run the current `carbon-install.sh` once to enable online updates.
 
 ### Uninstall
 
@@ -155,7 +157,7 @@ sh scripts/build-installer.sh
 sh scripts/build-ipk.sh
 ```
 
-**With the OpenWrt SDK**: put this directory under `package/` and run `make package/luci-theme-carbon/compile`.
+**With the OpenWrt SDK**: put this directory under `package/` and run `make package/luci-theme-carbon/compile` (supports 23.05 / 24.10 `opkg` and 25.x `apk` SDKs; 23.05 `-1` revisions are handled consistently by the installer and online updater).
 
 **APK signing**: raw SDK APKs are unsigned. See [signing setup and validation](docs/apk-signing.md) for local signing and the `APK_SIGNING_KEY` Actions secret required for releases.
 

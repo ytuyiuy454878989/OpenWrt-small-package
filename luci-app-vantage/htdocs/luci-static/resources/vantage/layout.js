@@ -11,10 +11,38 @@
    whatever their heights, and a short tile never stretches a tall
    neighbour. */
 
-var TILES = [ 'hero', 'chart', 'radios', 'clients', 'sys', 'talk', 'ssids' ];
+var TILES = [ 'hero', 'chart', 'radios', 'clients', 'sys', 'talk', 'ssids', 'wg', 'ports' ];
 
-/* tiles that only exist with Wi-Fi (Clients lists wired hosts too) */
-var WIFI = { radios: true, talk: true, ssids: true };
+/* tiles that only exist with Wi-Fi (Clients lists wired hosts too, and
+   Top talkers ranks those with a port to themselves) */
+var WIFI = { radios: true, ssids: true };
+
+/* the tile that only exists with a WireGuard tunnel, with Wi-Fi or
+   without. A tunnel makes no layouts of its own, as having no Wi-Fi
+   does (key): a layout is stored under the same key with a tunnel and
+   without, and one that does not mention the tile (any stored before
+   there was one, or arranged without a tunnel) gets it where the
+   default has it */
+var TUNNEL = { wg: true };
+
+/* the tile that only exists on a device with two Ethernet ports or more
+   (the view counts them: model.ports), with Wi-Fi or without. Like a
+   tunnel, ports make no layouts of their own: the same keys, and a
+   layout that does not mention the tile gets it where the default has
+   it */
+var PORTS = { ports: true };
+
+/* Provider tiles (#129): tiles another package fills with data (the
+   view's askTiles). Each goes by 'x' and its provider's id, a-z: a layout
+   keeps the theme's form for an id ([a-z]{1,8}), and no tile of this
+   package starts with x. At most EXTRA_MAX of them, the first by id, so
+   that a stored layout with every tile of its own (nine) stays within
+   the twelve the theme keeps. Like a tunnel, they make no layouts of
+   their own: a layout that does not mention one gets it where the
+   default has it, one column wide at the end of the right-hand column */
+var EXTRA = /^x[a-z]{1,7}$/;
+var EXTRA_MAX = 3;
+var EXTRA_AT = { wide: 3, mid: 1, narrow: 0 };
 
 var COLS = { wide: 4, mid: 2, narrow: 1 };
 
@@ -30,24 +58,40 @@ var FLEX = { chart: true, radios: true };
 /* how far a tile stretches to line up with the tile below it */
 var SNAP = 48;
 
-/* [ id, column, width ] */
+/* [ id, column, width ]; the WireGuard tile last: under Clients on a
+   wide screen, beside the right-hand column; then the Ports tile, as
+   wide as Clients there, the full width anywhere else: its cells wrap */
 var DEFAULTS = {
-	wide: [ [ 'hero', 0, 4 ], [ 'chart', 0, 2 ], [ 'radios', 2, 2 ], [ 'clients', 0, 3 ], [ 'sys', 3, 1 ], [ 'talk', 3, 1 ], [ 'ssids', 3, 1 ] ],
-	mid: [ [ 'hero', 0, 2 ], [ 'radios', 0, 2 ], [ 'clients', 0, 2 ], [ 'chart', 0, 2 ], [ 'sys', 0, 1 ], [ 'talk', 1, 1 ], [ 'ssids', 1, 1 ] ],
-	narrow: [ [ 'clients', 0, 1 ], [ 'talk', 0, 1 ], [ 'radios', 0, 1 ], [ 'hero', 0, 1 ], [ 'ssids', 0, 1 ], [ 'chart', 0, 1 ], [ 'sys', 0, 1 ] ]
+	wide: [ [ 'hero', 0, 4 ], [ 'chart', 0, 2 ], [ 'radios', 2, 2 ], [ 'clients', 0, 3 ], [ 'sys', 3, 1 ], [ 'talk', 3, 1 ], [ 'ssids', 3, 1 ], [ 'wg', 0, 2 ], [ 'ports', 0, 3 ] ],
+	mid: [ [ 'hero', 0, 2 ], [ 'radios', 0, 2 ], [ 'clients', 0, 2 ], [ 'chart', 0, 2 ], [ 'sys', 0, 1 ], [ 'talk', 1, 1 ], [ 'ssids', 1, 1 ], [ 'wg', 0, 1 ], [ 'ports', 0, 2 ] ],
+	narrow: [ [ 'clients', 0, 1 ], [ 'talk', 0, 1 ], [ 'radios', 0, 1 ], [ 'hero', 0, 1 ], [ 'ssids', 0, 1 ], [ 'chart', 0, 1 ], [ 'sys', 0, 1 ], [ 'wg', 0, 1 ], [ 'ports', 0, 1 ] ]
 };
 var DEFAULTS_WIRED = {
-	wide: [ [ 'hero', 0, 4 ], [ 'chart', 0, 3 ], [ 'sys', 3, 1 ], [ 'clients', 0, 4 ] ],
-	mid: [ [ 'hero', 0, 2 ], [ 'chart', 0, 2 ], [ 'sys', 0, 2 ], [ 'clients', 0, 2 ] ],
-	narrow: [ [ 'hero', 0, 1 ], [ 'clients', 0, 1 ], [ 'chart', 0, 1 ], [ 'sys', 0, 1 ] ]
+	wide: [ [ 'hero', 0, 4 ], [ 'chart', 0, 3 ], [ 'sys', 3, 1 ], [ 'clients', 0, 3 ], [ 'talk', 3, 1 ], [ 'wg', 0, 2 ], [ 'ports', 0, 4 ] ],
+	mid: [ [ 'hero', 0, 2 ], [ 'chart', 0, 2 ], [ 'clients', 0, 2 ], [ 'talk', 0, 1 ], [ 'sys', 1, 1 ], [ 'wg', 0, 2 ], [ 'ports', 0, 2 ] ],
+	narrow: [ [ 'hero', 0, 1 ], [ 'clients', 0, 1 ], [ 'talk', 0, 1 ], [ 'chart', 0, 1 ], [ 'sys', 0, 1 ], [ 'wg', 0, 1 ], [ 'ports', 0, 1 ] ]
 };
 
 function own(o, k) { return o != null && Object.prototype.hasOwnProperty.call(o, k); }
 function int(v, d) { v = Math.round(+v); return isFinite(v) ? v : d; }
 
+/* the provider tiles a page has: well-formed ids, each once, the first
+   EXTRA_MAX in id order */
+function extras(list) {
+	var out = [];
+	(Array.isArray(list) ? list : []).forEach(function(id) { if (typeof id === 'string' && EXTRA.test(id) && out.indexOf(id) < 0) out.push(id); });
+	return out.sort().slice(0, EXTRA_MAX);
+}
+
 return baseclass.extend({
 	TILES: TILES,
 	SNAP: SNAP,
+	EXTRA_MAX: EXTRA_MAX,
+
+	/* a provider tile's id ('xdns'): a tile of another package */
+	isExtra: function(id) { return typeof id === 'string' && EXTRA.test(id); },
+
+	extras: extras,
 
 	/* screen class for a layout width; the breakpoints match app.css */
 	tier: function(width) {
@@ -59,7 +103,13 @@ return baseclass.extend({
 	/* the storage key of a layout: Wi-Fi and wired devices differ */
 	key: function(tier, wired) { return tier + (wired ? '-wired' : ''); },
 
-	available: function(id, wired) { return TILES.indexOf(id) >= 0 && !(wired && WIFI[id]); },
+	/* wg: a WireGuard tunnel exists (the view says: one seen this session);
+	   ports: the device has two Ethernet ports or more (seen likewise);
+	   extra: the provider tiles this page has */
+	available: function(id, wired, wg, ports, extra) {
+		if (EXTRA.test(id)) return extras(extra).indexOf(id) >= 0;
+		return TILES.indexOf(id) >= 0 && !(wired && WIFI[id]) && !(TUNNEL[id] && !wg) && !(PORTS[id] && !ports);
+	},
 
 	minW: function(id, tier) {
 		var m = own(MIN, tier) && own(MIN[tier], id) ? MIN[tier][id] : 1;
@@ -74,21 +124,23 @@ return baseclass.extend({
 		return { id: e.id, c: c, w: w, hide: e.hide === true };
 	},
 
-	defaults: function(tier, wired) {
+	defaults: function(tier, wired, wg, ports, extra) {
 		var src = own(DEFAULTS, tier) ? (wired ? DEFAULTS_WIRED : DEFAULTS)[tier] : DEFAULTS.narrow;
-		var self = this;
-		return src.map(function(d) { return self.fit({ id: d[0], c: d[1], w: d[2] }, tier); });
+		var self = this, at = own(EXTRA_AT, tier) ? EXTRA_AT[tier] : 0;
+		return src.filter(function(d) { return self.available(d[0], wired, wg, ports); })
+			.concat(extras(extra).map(function(id) { return [ id, at, 1 ]; }))
+			.map(function(d) { return self.fit({ id: d[0], c: d[1], w: d[2] }, tier); });
 	},
 
 	/* a stored layout made safe: known tiles only, each once, sizes in
 	   range, tiles it does not mention added after the tile that
 	   precedes them by default */
-	normalize: function(saved, tier, wired) {
+	normalize: function(saved, tier, wired, wg, ports, extra) {
 		var self = this, seen = Object.create(null), out = [];
-		var def = this.defaults(tier, wired);
+		var def = this.defaults(tier, wired, wg, ports, extra);
 		if (!Array.isArray(saved)) return def;
 		saved.slice(0, 32).forEach(function(e) {
-			if (!e || typeof e !== 'object' || typeof e.id !== 'string' || seen[e.id] || !self.available(e.id, wired)) return;
+			if (!e || typeof e !== 'object' || typeof e.id !== 'string' || seen[e.id] || !self.available(e.id, wired, wg, ports, extra)) return;
 			seen[e.id] = true;
 			out.push(self.fit(e, tier));
 		});

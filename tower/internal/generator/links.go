@@ -133,7 +133,15 @@ func shadowsocksLink(node model.ProxyNode) (string, bool) {
 
 	// Dropping the plugin would hand out a link that looks fine and cannot
 	// connect, which is exactly what the importer refuses to accept.
-	if node.Plugin == "v2ray-plugin" {
+	if node.ShadowTLS != nil {
+		plugin := "shadow-tls;host=" + sip003Value(node.ShadowTLS.Host) +
+			";password=" + sip003Value(node.ShadowTLS.Password) +
+			";version=" + strconv.Itoa(node.ShadowTLS.Version)
+		if node.ShadowTLS.SkipCertificateVerification {
+			plugin += ";skip-cert-verify=true"
+		}
+		b.WriteString("?plugin=" + percentEncode(plugin, "-._~"))
+	} else if node.Plugin == "v2ray-plugin" {
 		plugin := "v2ray-plugin;mode=websocket"
 		if node.PluginMux != nil {
 			mux := "0"
@@ -146,16 +154,16 @@ func shadowsocksLink(node model.ProxyNode) (string, bool) {
 			plugin += ";tls"
 		}
 		if node.HostHeader != "" {
-			plugin += ";host=" + node.HostHeader
+			plugin += ";host=" + sip003Value(node.HostHeader)
 		}
 		if p := node.ExportablePath(); p != "" {
-			plugin += ";path=" + p
+			plugin += ";path=" + sip003Value(p)
 		}
 		b.WriteString("?plugin=" + percentEncode(plugin, "-._~"))
 	} else if mode := strings.ToLower(node.Obfs); mode == "http" || mode == "tls" {
 		plugin := "obfs-local;obfs=" + mode
 		if node.ObfsParam != "" {
-			plugin += ";obfs-host=" + node.ObfsParam
+			plugin += ";obfs-host=" + sip003Value(node.ObfsParam)
 		}
 		b.WriteString("?plugin=" + percentEncode(plugin, "-._~"))
 	}
@@ -527,6 +535,16 @@ func snellLine(node model.ProxyNode) string {
 		parts = append(parts, "obfs="+mode)
 		if node.ObfsParam != "" {
 			parts = append(parts, "obfs-host="+node.ObfsParam)
+		}
+	}
+	if node.ShadowTLS != nil {
+		parts = append(parts,
+			"shadow-tls-password="+node.ShadowTLS.Password,
+			"shadow-tls-sni="+node.ShadowTLS.Host,
+			"shadow-tls-version="+strconv.Itoa(node.ShadowTLS.Version))
+		// ShadowTLS only wraps TCP: udp-relay only when the source asked.
+		if node.UDPRelayEnabled != nil && *node.UDPRelayEnabled && version >= 3 {
+			parts = append(parts, "udp-relay=true")
 		}
 	}
 	return strings.Join(parts, ", ")

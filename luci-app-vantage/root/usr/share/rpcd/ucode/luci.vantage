@@ -7,8 +7,12 @@
 //              reads: no key, sae_password, RADIUS or 802.11r secrets, no
 //              EAP credentials. Where netifd has no network.wireless object
 //              (vendor drivers that bypass it, such as MediaTek's mtkwifi),
-//              the same fields from /etc/config/wireless instead. Read group
-//              luci-app-vantage.
+//              the same fields from /etc/config/wireless instead. An
+//              interface in AP mode also names the interfaces hostapd
+//              made for its VLANs, where a password or RADIUS gives a
+//              station its VLAN (vlans: their names, from one dump of
+//              the kernel's wireless interfaces; nothing else of them).
+//              Read group luci-app-vantage.
 //   thermal    the temperature of each thermal zone in /sys/class/thermal
 //              (millidegrees Celsius) with its type; nothing else is read.
 //              Read group luci-app-vantage.
@@ -68,11 +72,19 @@
 
 'use strict';
 
+// The two netlink modules come first (#134); LuCI's own rpcd script loads
+// the other three as well. rpcd frees the VM of a script that fails to
+// load, and ucode before late 2024 (OpenWrt 23.05, vendor firmware built
+// on it) keeps those three modules' types in variables the last script to
+// load them sets: had this plugin loaded them and then failed on a netlink
+// module that cannot load (one from another distribution's feed), LuCI's
+// script would run on freed memory, which can crash rpcd and every login
+// with it. tests/plugin.test.js keeps the order.
+import * as rtnl from 'rtnl';
+import * as nl80211 from 'nl80211';
 import { cursor } from 'uci';
 import { connect } from 'ubus';
 import { access, lsdir, readfile } from 'fs';
-import * as rtnl from 'rtnl';
-import * as nl80211 from 'nl80211';
 
 const CONFIG = 'vantage';
 const WIRELESS = 'wireless';      // read only, by wireless_from_config()
@@ -98,6 +110,9 @@ const BOARD_MAX = 65536;          // bytes read of it
 const MAX_SWITCH_VLANS = 64;
 const MAX_SURVEY = 256;          // channels in a survey reply (a tri-band wiphy has about 100)
 const MAX_MHZ = 100000;          // a channel's frequency, MHz (60 GHz is 70200)
+const IFTYPE_AP = 3;             // enum nl80211_iftype, the kernel's ABI
+const IFTYPE_AP_VLAN = 4;
+const MAX_VLAN_IFS = 32;         // VLAN interfaces named in a wireless reply
 
 // Patterns, compiled once: ucode compiles a regular expression literal each
 // time the code reaches it, and a counted repeat ({1,64}) costs musl
@@ -114,6 +129,7 @@ const RE_PAIRS = /../g;
 const RE_SPACES = /\s+/;
 const RE_ENCRYPTION = /^[A-Za-z0-9+_-]{1,40}/;
 const RE_NAME = /^[A-Za-z0-9_.-]{1,64}$/;          // radio sections, interfaces
+const RE_HT = /^HT(20|40|80|160)$/;                 // qcawificfg80211's htmode, whatever the standard
 const RE_ZONE = /^thermal_zone[0-9]{1,3}$/;
 const RE_MILLIDEG = /^-?[0-9]{1,7}$/;
 const RE_ZONE_TYPE = /^[A-Za-z0-9_.-]{1,40}$/;
@@ -327,27 +343,64 @@ function reduce_radio(r) {
 	};
 }
 
+// the names in /sys/class/net
+function netdevs() {
+	return lsdir(NET) ?? [];
+}
+
+// Qualcomm's qcawificfg80211 (QSDK firmware such as QWRT) names no ifname:
+// each wifi-iface section is named after its interface (ath0, ath1), so
+// take the section's name when that device exists (in devs, the names in
+// /sys/class/net). Its htmode is HT20 to HT160 whatever the standard,
+// which hwmode carries ('11axa', '11ac', ...): without this its radios
+// read as Wi-Fi 4.
+function qca_ifname(s, devs) {
+	let n = s['.name'];
+
+	return (match(n, RE_NETDEV) && n != '.' && n != '..' && index(devs, n) >= 0) ? n : null;
+}
+
+function qca_htmode(c) {
+	let ht = (type(c.htmode) == 'string') ? match(c.htmode, RE_HT) : null;
+	let hw = (type(c.hwmode) == 'string') ? lc(c.hwmode) : '';
+
+	if (!ht)
+		return c.htmode;
+
+	return (index(hw, 'be') >= 0) ? 'EHT' + ht[1] : (index(hw, 'ax') >= 0) ? 'HE' + ht[1] : (index(hw, 'ac') >= 0) ? 'VHT' + ht[1] : c.htmode;
+}
+
 // The same reply from /etc/config/wireless, for firmware whose driver
-// bypasses netifd. Only enabled interfaces that name their ifname, since
-// the view can look nothing else up; the first section to claim a name
-// wins. Run state stays unknown here: iwinfo is served by rpcd itself, so
-// asking it from a plugin would wait on rpcd. No txpower either: vendor
-// drivers do not configure it in dBm (mtkwifi: per cent).
+// bypasses netifd. Only enabled interfaces that name their ifname (or, on
+// qcawificfg80211, are named after one), since the view can look nothing
+// else up; the first section to claim a name wins. Run state stays unknown
+// here: iwinfo is served by rpcd itself, so asking it from a plugin would
+// wait on rpcd. No txpower either: vendor drivers do not configure it in
+// dBm (mtkwifi: per cent).
 function wireless_from_config() {
 	let wl = cursor();
-	let radios = {}, taken = {}, out = {};
+	let radios = {}, taken = {}, out = {}, devs = null;
 
 	if (!wl.load(WIRELESS))
 		return out;
 
 	wl.foreach(WIRELESS, 'wifi-device', (s) => {
 		if (match(s['.name'], RE_NAME))
-			radios[s['.name']] = { disabled: uci_true(s.disabled), config: { ...s, txpower: null }, interfaces: [] };
+			radios[s['.name']] = {
+				disabled: uci_true(s.disabled),
+				config: { ...s, txpower: null, htmode: (s.type == 'qcawificfg80211') ? qca_htmode(s) : s.htmode },
+				interfaces: []
+			};
 	});
 
 	wl.foreach(WIRELESS, 'wifi-iface', (s) => {
 		let r = (type(s.device) == 'string') ? radios[s.device] : null;
-		let ifname = s.ifname;
+		let qca = (s.ifname == null && r?.config?.type == 'qcawificfg80211');
+
+		if (qca && devs == null)
+			devs = netdevs();
+
+		let ifname = qca ? qca_ifname(s, devs) : s.ifname;
 
 		if (type(r) != 'object' || uci_true(s.disabled) || type(ifname) != 'string' ||
 		    !match(ifname, RE_NAME) || taken[ifname])
@@ -365,6 +418,68 @@ function wireless_from_config() {
 		out[name] = { ...reduce_radio(r), source: 'config' };
 
 	return out;
+}
+
+// The interfaces hostapd made for a network's VLANs, where a password or
+// RADIUS gives a station its VLAN (#164): { <the network's interface>:
+// [ name ] }, MAX_VLAN_IFS in all. An AP_VLAN interface is its network's
+// by its address, which hostapd makes the network's own, on the same
+// wiphy; no one's where two networks there share that address. A WDS
+// station's interface (<ifname>.staN) is an AP_VLAN one too and is left
+// out: iwinfo lists its station under the network's interface, the
+// others' only under their own. netifd knows only the ones it made
+// itself, so the kernel is asked: one read-only dump (a driver may be
+// asked for an interface's transmit power while it answers, as for `iw dev`).
+function ap_vlans() {
+	let res = nl80211.request(nl80211.const.NL80211_CMD_GET_INTERFACE, nl80211.const.NLM_F_DUMP);
+	let aps = {}, out = {}, n = 0;
+
+	res = (type(res) == 'array') ? res : ((type(res) == 'object') ? [ res ] : []);
+
+	// wiphy and address: what a network's interface and its VLANs' share
+	let key = (i) => (type(i) == 'object' && type(i.wiphy) == 'int' && type(i.ifname) == 'string' && match(i.ifname, RE_NETDEV) && norm_mac(i.mac))
+		? i.wiphy + ' ' + norm_mac(i.mac) : null;
+
+	for (let i in res) {
+		let k = key(i);
+
+		if (k && i.iftype === IFTYPE_AP)
+			aps[k] = (k in aps) ? false : i.ifname;
+	}
+
+	for (let i in res) {
+		if (n >= MAX_VLAN_IFS)
+			break;
+
+		let k = key(i), ap = (k && i.iftype === IFTYPE_AP_VLAN) ? aps[k] : null;
+
+		if (!ap || index(i.ifname, ap + '.sta') == 0)
+			continue;
+
+		if (!out[ap])
+			out[ap] = [];
+
+		push(out[ap], i.ifname);
+		n++;
+	}
+
+	for (let ap, l in out)
+		sort(l);
+
+	return out;
+}
+
+// a wireless reply, each network's interface with its VLANs' interfaces
+// (vlans), where it has any
+function with_vlans(radios) {
+	let vl = ap_vlans();
+
+	for (let name, r in radios)
+		for (let i in r.interfaces)
+			if (type(i.ifname) == 'string' && vl[i.ifname])
+				i.vlans = vl[i.ifname];
+
+	return radios;
 }
 
 /* ---------------------------------------------------------- set_alias */
@@ -564,7 +679,7 @@ function bridge_table() {
 	let left = FDB_LIMIT * FDB_ENTRY;
 	let sig = '', ages = {}, ports = {}, multi = false, tables = [];
 
-	for (let n in (lsdir(NET) ?? [])) {
+	for (let n in netdevs()) {
 		let b = netdev(n) ? readfile(NET + '/' + n + '/brforward', left) : null;
 
 		if (type(b) != 'string')
@@ -854,13 +969,13 @@ const methods = {
 			// no object, or one that skipped every radio (netifd has no
 			// handler for the vendor's driver type): the config instead
 			if (type(reply) != 'object' || !length(reply))
-				return wireless_from_config();
+				return with_vlans(wireless_from_config());
 
 			for (let name, r in reply)
 				if (type(r) == 'object' && match(name, RE_NAME))
 					out[name] = reduce_radio(r);
 
-			return out;
+			return with_vlans(out);
 		}
 	},
 

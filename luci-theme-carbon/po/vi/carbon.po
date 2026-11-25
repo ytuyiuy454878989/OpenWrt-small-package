@@ -8,6 +8,14 @@ msgid "%d cores"
 msgstr "%d nhân"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "%d device"
+msgstr "%d thiết bị"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "%d devices"
+msgstr "%d thiết bị"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "%d min"
 msgstr "%d phút"
 
@@ -40,6 +48,18 @@ msgid "%s left"
 msgstr "còn %s"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "+%d more"
+msgstr "+%d khác"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "1 / 5 / 15 min load: %s · %s · %s"
+msgstr "Tải 1 / 5 / 15 phút: %s · %s · %s"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "1 / 5 / 15 min load: %s · %s · %s (%d cores)"
+msgstr "Tải 1 / 5 / 15 phút: %s · %s · %s (%d nhân)"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "1 min average"
 msgstr "Trung bình 1 phút"
 
@@ -58,6 +78,26 @@ msgstr "Đã có phiên bản mới."
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "About this setting"
 msgstr "Về cài đặt này"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add live traffic"
+msgstr "Thêm lưu lượng trực tiếp"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add page"
+msgstr "Thêm trang"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add to Common"
+msgstr "Thêm vào Thường dùng"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Add to System"
+msgstr "Thêm vào Hệ thống"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Added"
+msgstr "Đã thêm"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "All settings"
@@ -88,8 +128,16 @@ msgid "Auto"
 msgstr "Tự động"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Back"
+msgstr "Quay lại"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Backup & Upgrade"
 msgstr "Sao lưu và nâng cấp"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Busy"
+msgstr "Bận"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Cache"
@@ -99,6 +147,7 @@ msgstr "Bộ đệm"
 msgid "Camera"
 msgstr "Camera"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Cancel"
 msgstr "Hủy"
@@ -125,9 +174,29 @@ msgstr "Đang kiểm tra cập nhật…"
 msgid "Choose a valid traffic source."
 msgstr "Hãy chọn nguồn dữ liệu lưu lượng hợp lệ."
 
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Choose which pages appear in the Simple sidebar and arrange their order. Saved on this router across devices and firmware upgrades."
+msgstr "Chọn các trang hiển thị ở thanh bên Đơn giản và sắp xếp thứ tự. Được lưu trên router, đồng bộ giữa các thiết bị và giữ nguyên khi nâng cấp firmware."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Choose which panels appear on Overview and arrange them in sections. Saved on this router across devices and firmware upgrades."
+msgstr "Chọn các bảng hiển thị trên trang Tổng quan và sắp xếp theo nhóm. Được lưu trên router, đồng bộ giữa các thiết bị và giữ nguyên khi nâng cấp firmware."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Clear"
+msgstr "Xóa"
+
 #: htdocs/luci-static/carbon/carbon.js
 msgid "click to switch"
 msgstr "nhấn để chuyển"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Close"
+msgstr "Đóng"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Collapse panel to preview"
+msgstr "Thu gọn bảng để xem trước"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Collapse sidebar"
@@ -162,6 +231,10 @@ msgid "Connections"
 msgstr "Kết nối"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Core monitoring"
+msgstr "Giám sát chính"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "CPU"
 msgstr "CPU"
 
@@ -170,8 +243,49 @@ msgid "Current logo"
 msgstr "Logo hiện tại"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Customize"
+msgstr "Tùy chỉnh"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Customize dashboard"
+msgstr "Tùy chỉnh bảng điều khiển"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Customize menu"
+msgstr "Tùy chỉnh menu"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Customize on Overview"
+msgstr "Tùy chỉnh tại Tổng quan"
+
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Customize simple menu"
+msgstr "Tùy chỉnh menu đơn giản"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Dark"
 msgstr "Tối"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Dashboard layout"
+msgstr "Bố cục bảng điều khiển"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Default"
+msgstr "Mặc định"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Default dashboard layout restored."
+msgstr "Đã khôi phục bố cục bảng điều khiển mặc định."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Default simple menu restored."
+msgstr "Đã khôi phục menu đơn giản mặc định."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Details"
+msgstr "Chi tiết"
 
 #: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
@@ -215,8 +329,20 @@ msgid "Enter an HTTPS mirror prefix such as https://mirror.example.com/ (letters
 msgstr "Nhập tiền tố máy chủ gương HTTPS như https://mirror.example.com/ (chỉ chữ cái, chữ số và . _ ~ % + -)."
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Expand"
+msgstr "Mở rộng"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Expand sidebar"
 msgstr "Mở rộng thanh bên"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Failed to save layout."
+msgstr "Không thể lưu bố cục."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Failed to save menu."
+msgstr "Không thể lưu menu."
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Free"
@@ -241,6 +367,22 @@ msgstr "Mạng ẩn"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Hide detailed status"
 msgstr "Ẩn trạng thái chi tiết"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "High"
+msgstr "Cao"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Home Wi-Fi"
+msgstr "Wi-Fi gia đình"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "In Common"
+msgstr "Trong Thường dùng"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "In System"
+msgstr "Trong Hệ thống"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Install curl, ca-bundle and flock, and restore the Carbon public key if missing."
@@ -274,6 +416,16 @@ msgstr "Giao tiếp mạng"
 msgid "Internet & Network"
 msgstr "Internet và mạng"
 
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Invalid dashboard layout."
+msgstr "Bố cục bảng điều khiển không hợp lệ."
+
+#: htdocs/luci-static/carbon/carbon.js
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Invalid simple menu configuration."
+msgstr "Cấu hình menu đơn giản không hợp lệ."
+
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Invalid update request."
 msgstr "Yêu cầu cập nhật không hợp lệ."
@@ -281,6 +433,14 @@ msgstr "Yêu cầu cập nhật không hợp lệ."
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "IPK updates are downloaded over HTTPS and checked against the release SHA-256 and file size."
 msgstr "Bản cập nhật IPK được tải qua HTTPS và đối chiếu với SHA-256 và kích thước tệp đã công bố."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Keep at least one menu item."
+msgstr "Giữ ít nhất một mục menu."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Keep at least one panel visible."
+msgstr "Giữ ít nhất một bảng hiển thị."
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Known to this router"
@@ -331,6 +491,10 @@ msgid "Manage"
 msgstr "Quản lý"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Maximum %d menu items."
+msgstr "Tối đa %d mục menu."
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "May include offline devices."
 msgstr "Có thể bao gồm thiết bị ngoại tuyến."
 
@@ -345,6 +509,18 @@ msgstr "Menu"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Mirror prefix"
 msgstr "Tiền tố máy chủ gương"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Move down"
+msgstr "Chuyển xuống"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Move up"
+msgstr "Chuyển lên"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Multi-WAN"
+msgstr "Đa WAN"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Need more settings? Switch to"
@@ -367,6 +543,10 @@ msgid "nlbwmon (default)"
 msgstr "nlbwmon (mặc định)"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "No configured pages are currently installed."
+msgstr "Hiện không có trang nào đã cấu hình được cài đặt."
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "No devices yet"
 msgstr "Chưa có thiết bị"
 
@@ -375,8 +555,20 @@ msgid "No installation log yet."
 msgstr "Chưa có nhật ký cài đặt."
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "No items in this group."
+msgstr "Chưa có mục nào trong nhóm này."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "No matching pages."
+msgstr "Không tìm thấy trang phù hợp."
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "No wireless"
 msgstr "Không có Wi-Fi"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Normal"
+msgstr "Bình thường"
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Not checked"
@@ -389,6 +581,10 @@ msgstr "Chưa kết nối"
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Not enough temporary storage or unable to create update files."
 msgstr "Không đủ bộ nhớ tạm hoặc không thể tạo tệp cập nhật."
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Not installed"
+msgstr "Chưa cài đặt"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Now"
@@ -426,6 +622,7 @@ msgstr "Tổng quan"
 msgid "Password"
 msgstr "Mật khẩu"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Permission denied. Log out and log in again once after updating Carbon, then retry."
 msgstr "Không có quyền. Sau khi cập nhật Carbon, hãy đăng xuất và đăng nhập lại một lần rồi thử lại."
@@ -441,6 +638,10 @@ msgstr "Điện thoại"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "PPPoE"
 msgstr "PPPoE"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Preset"
+msgstr "Mẫu sẵn"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Printer"
@@ -483,13 +684,23 @@ msgid "Reload page"
 msgstr "Tải lại trang"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Remove"
+msgstr "Xóa"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Resources"
 msgstr "Tài nguyên"
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Restore default"
 msgstr "Khôi phục mặc định"
 
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Router overview"
+msgstr "Tổng quan router"
+
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Save"
 msgstr "Lưu"
@@ -502,9 +713,14 @@ msgstr "Đã lưu. Tải xuống sẽ thử máy chủ gương trước, sau đ�
 msgid "Saved. Downloads use GitHub directly."
 msgstr "Đã lưu. Tải xuống dùng trực tiếp GitHub."
 
+#: htdocs/luci-static/carbon/carbon.js
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Saving…"
 msgstr "Đang lưu…"
+
+#: htdocs/luci-static/carbon/carbon.js
+msgid "Search pages or plugins…"
+msgstr "Tìm trang hoặc plugin…"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Show all %d devices"
@@ -525,6 +741,10 @@ msgstr "Hiển thị ở thanh bên, trang đăng nhập, trang tổng quan và 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Simple"
 msgstr "Đơn giản"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Simple menu"
+msgstr "Menu đơn giản"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Since %s"
@@ -547,12 +767,20 @@ msgid "Speaker"
 msgstr "Loa"
 
 #: htdocs/luci-static/carbon/carbon.js
+msgid "Stat tiles"
+msgstr "Thẻ chỉ số"
+
+#: htdocs/luci-static/carbon/carbon.js
 msgid "Static address"
 msgstr "Địa chỉ tĩnh"
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Storage"
 msgstr "Lưu trữ"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Switch to Carbon theme to customize the simple menu."
+msgstr "Chuyển sang giao diện Carbon để tùy chỉnh menu đơn giản."
 
 #: htdocs/luci-static/carbon/carbon.js
 msgid "System"
@@ -677,6 +905,22 @@ msgstr "Thời gian hoạt động"
 #: htdocs/luci-static/carbon/carbon.js
 msgid "Used"
 msgstr "Đã dùng"
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using a custom dashboard layout."
+msgstr "Đang dùng bố cục bảng điều khiển tùy chỉnh."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using a custom simple menu."
+msgstr "Đang dùng menu đơn giản tùy chỉnh."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using the default dashboard layout."
+msgstr "Đang dùng bố cục bảng điều khiển mặc định."
+
+#: htdocs/luci-static/resources/view/system/carbon-update.js
+msgid "Using the default simple menu."
+msgstr "Đang dùng menu đơn giản mặc định."
 
 #: htdocs/luci-static/resources/view/system/carbon-update.js
 msgid "Verifying update…"
